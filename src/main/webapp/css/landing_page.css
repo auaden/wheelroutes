@@ -1,0 +1,90 @@
+@import url(http://fonts.googleapis.com/css?family=Montserrat);
+
+html,body{
+    font-family:  Montserrat, Trebuchet, sans-serif; height: 100%; margin: 0; padding: 0;
+}
+
+.navbar.navbar-default{
+    font-family:  Montserrat, Trebuchet, sans-serif;
+}
+
+/*GOOGLE MAP*/
+#map{
+    position: relative;
+    background-color: grey;
+    z-index: 2;
+}
+
+.filterResults{
+    display: none;
+}
+
+.navbar{
+    background-color: #EFAA1F;
+}
+
+.navbar-brand{
+    margin-top: -10px;
+}
+
+.navbar-fixed-bottom{
+    position: relative;
+    margin-top: 0px;
+}
+
+.navbar-right, #gps{
+    margin-top: 5px;
+}
+
+/*for jqRangeSlider*/
+#dateSlider, #hourSlider{
+    margin-bottom: 5px;
+    font-size: 10px;
+}
+
+.btn-toolbar{
+    margin-top: 5px;
+}
+
+#gps{
+    margin-bottom: -25px;
+}
+
+#login, #logout #drop{
+    margin-bottom: -15px;
+}
+
+.modal{
+    margin-top: 40px;
+}
+
+.modal-backdrop {
+    /*to display the modal in front of everything else*/
+    z-index: -1;
+}
+
+.alert{
+    margin-bottom: 0px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.navbar-fixed-bottom{
+    position: relative;
+    margin-top: 0px;
+}
+
+/*.dropdown-menu{*/
+    /*width: 50px !important;*/
+/*}*/
+
+.dropup{
+    margin-top: 25px;
+    /*width: 50px;*/
+}
+
+#filter{
+    margin-top: 25px;
+}
+
+
