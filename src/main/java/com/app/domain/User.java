@@ -6,6 +6,7 @@ package com.app.domain;
 public class User {
     private String email;
     private String password;
+    private int sensitivity;
 
     public User(){
     }
@@ -29,6 +30,14 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public int getSensitivity() {
+        return sensitivity;
+    }
+
+    public void setSensitivity(int sensitivity) {
+        this.sensitivity = sensitivity;
     }
 
 }
