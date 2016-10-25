@@ -62,7 +62,8 @@ public class UserDao {
 
     public User find(String email) {
         //normal method
-        String sql = "select email, password, sensitivity from \"user\" where email = ?";
+        String sql = "select email, password from \"user\" where email = ?";
+        //String sql = "select email, password, sensitivity from \"user\" where email = ?";
         try {
             User toReturn = jdbcTemplate.queryForObject(
                     sql,
@@ -74,7 +75,7 @@ public class UserDao {
                             User user = new User();
                             user.setEmail(resultSet.getString("email"));
                             user.setPassword(resultSet.getString("password"));
-                            user.setSensitivity(resultSet.getInt("sensitivity"));
+                            //user.setSensitivity(resultSet.getInt("sensitivity"));
                             return user;
                         }
                     }, email);
