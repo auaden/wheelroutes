@@ -48,8 +48,39 @@ public class UserService {
             errorMsg = "Username taken. Please choose another";
             return errorMsg;
         }
-
+        
         userDao.insert(user);
         return errorMsg;
     }
+    
+    public String register(User user, int sensitivity) {
+        String errorMsg = null;
+        String email = user.getEmail().trim();
+        String password = user.getPassword().trim();
+
+        if (email.length() == 0 || password.length() == 0) {
+            errorMsg = "Please fill in all the blanks";
+            return errorMsg;
+        }
+
+        //check if email is taken
+        User foundUser = userDao.find(email);
+        if (foundUser != null) {
+            errorMsg = "Username taken. Please choose another";
+            return errorMsg;
+        }
+        
+        userDao.insert(user, sensitivity);
+        return errorMsg;
+    }
+    
+    //difference 
+    public void modifySensitivity(User user, int sensitivityAdjust) {
+        if (sensitivityAdjust > 0) {
+            userDao.modifySensitivity(user, 1); //increase
+        } else {
+            userDao.modifySensitivity(user, -1); //decrease
+        }
+    }
+    
 }

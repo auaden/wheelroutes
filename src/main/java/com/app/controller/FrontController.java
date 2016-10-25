@@ -132,6 +132,8 @@ public class FrontController {
     public ModelAndView register(@ModelAttribute("user") User user) {
         ModelAndView mv = new ModelAndView();
         String errorMsg = userService.register(user);
+        //String errorMsg = userService.register(user, sensitivity);
+        
         if (errorMsg != null) {
             mv.addObject("errorMsg", errorMsg);
             mv.setViewName("register");
