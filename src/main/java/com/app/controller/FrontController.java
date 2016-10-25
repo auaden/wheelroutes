@@ -79,10 +79,10 @@ public class FrontController {
         ModelAndView mv = new ModelAndView("coordinatesView", "user", new User());
         System.out.println("Retrieving rating map...");
 //        HashMap<String, Integer> ratingMap = axisService.retrieveRatingMap();
-        HashMap<String, Integer> ratingMap = axisService.retrieveRatingMap(9, "2016-10-06 08:29", "2016-10-06 23:34");
+        HashMap<String, Integer> ratingMap = axisService.retrieveRatingMap(2, "2016-10-22 00:00", "2016-10-22 23:59");
 //        TreeMap<Integer, ArrayList<Coordinate>> coordinates = coordinateService.startProcessing(ratingMap);
         System.out.println("processing data...");
-        HashMap<ArrayList<Coordinate>, Integer> coordinates = coordinateService.startProcessing(9, "2016-10-06 08:29", "2016-10-06 23:34" , ratingMap);
+        HashMap<ArrayList<Coordinate>, Integer> coordinates = coordinateService.startProcessing(2, "2016-10-22 00:00", "2016-10-22 23:59" , ratingMap);
         System.out.println("processing data...done");
         mv.addObject("viewCoordinates", coordinates);
         return mv;
