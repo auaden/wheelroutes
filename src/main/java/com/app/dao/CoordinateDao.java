@@ -157,7 +157,7 @@ public class CoordinateDao {
                             double lat = resultSet.getDouble("latitude");
                             double lng = resultSet.getDouble("longitude");
                             int numSat = resultSet.getInt("numSatellite");
-                            if (resultSet.getString("timestamp").trim().equals("0") || lat == 0 || lng == 0 || numSat < 5) {
+                            if (resultSet.getString("timestamp").trim().equals("0") || lat == 0 || lng == 0 || numSat < 6) {
                                 return null;
                             } else {
                                 Timestamp timestamp = Timestamp.valueOf(resultSet.getString("timestamp"));
@@ -186,7 +186,7 @@ public class CoordinateDao {
                             double lng = resultSet.getDouble("longitude");
                             int numSat = resultSet.getInt("numSatellite");
                             int rating = resultSet.getInt("rating");
-                            if (resultSet.getString("timestamp").trim().equals("0") || lat == 0 || lng == 0 || numSat < 5) {
+                            if (resultSet.getString("timestamp").trim().equals("0") || lat == 0 || lng == 0 || numSat < 6) {
                                 return null;
                             } else {
                                 Timestamp timestamp = Timestamp.valueOf(resultSet.getString("timestamp"));

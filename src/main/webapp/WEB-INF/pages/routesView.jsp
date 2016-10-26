@@ -36,7 +36,7 @@
 <body>
 <%--hidden form field for processing of filter inputs--%>
 <div class="filterResults">
-    <form id="filterForm" action="/process-filter-coordinates.do"  method="POST"> 
+    <form id="filterForm" action="/process-filter-routes.do"  method="POST"> 
         <label class="control-label">User ID: </label>
         <input class="form-control" type="hidden" id="userId" name="userId" value=""><br> 
         <label class="control-label">Start Date and Time</label>
@@ -266,10 +266,6 @@
                 }
             ]
         });
-    }
-
-    function drop() {
-        clearMarkers();
 
         var Colors = [
             "#000000",
@@ -282,37 +278,26 @@
             "#db2902"
         ];
 
-        var i = 0;
-        <c:forEach var="entry" items="${viewCoordinates}">
-        var position = {lat:${entry.latitude}, lng:${entry.longitude}}
-        var ratingColor = Colors[${entry.rating} + 1];
-        addMarkerWithTimeout(position, i * 100, ratingColor);
-        i++;
+        <c:forEach var="entry1" items="${viewCoordinates}">
+        var rating = ${entry1.value.rating} + 1
+        var routeCoordinates = [
+            <c:forEach var="mapEntry" items="${entry1.value.route}">
+            //coordinate
+            {lat:${mapEntry.latitude}, lng:${mapEntry.longitude}},
+            </c:forEach>
+        ];
+
+        var route = new google.maps.Polyline({
+            path: routeCoordinates,
+            strokeOpacity: 1,
+            strokeColor: Colors[rating],
+            strokeWeight: 5
+        });
+        route.setMap(map);
         </c:forEach>
     }
 
-    function addMarkerWithTimeout(position, timeout, color) {
-        window.setTimeout(function() {
-            markers.push(new google.maps.Marker({
-                position: position,
-                map: map,
-                icon: {
-                    path: google.maps.SymbolPath.CIRCLE,
-                    fillOpacity: 1.0,
-                    fillColor: color,
-                    strokeColor: color,
-                    scale: 3.0
-                }
-            }));
-        }, timeout);
-    }
 
-    function clearMarkers() {
-        for (var i = 0; i < markers.length; i++) {
-            markers[i].setMap(null);
-        }
-        markers = [];
-    }
 </script>
 
 <!-- Include all compiled plugins (below), or include individual files as needed -->

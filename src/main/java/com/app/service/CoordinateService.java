@@ -5,6 +5,7 @@ import com.app.Utility.StopWatch;
 import com.app.dao.CoordinateDao;
 import com.app.domain.Coordinate;
 //import com.sun.tools.corba.se.idl.InterfaceGen;
+import com.app.domain.Route;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -68,7 +69,7 @@ public class CoordinateService {
                 String key = userId + "," + timestamp;
                 Integer rating = ratingMap.get(key);
                 if (rating == null) {
-                    System.out.println("NULL!" + timestamp);
+                    //System.out.println("NULL!" + timestamp);
                     coordinate.setRating(-1);
                 } else {
                     coordinate.setRating(rating);
@@ -112,73 +113,107 @@ public class CoordinateService {
 
     //new algorithms
 
-    public HashMap<ArrayList<Coordinate>, Integer> startProcessing (HashMap<String, Integer> ratingMap) {
-        ArrayList<Coordinate> coordinates = (ArrayList<Coordinate>)coordinateDao.findAll(coordRawTableName, true);
-        return runAlgorithms(coordinates, ratingMap);
-    }
-
-    public HashMap<ArrayList<Coordinate>, Integer> startProcessing (int userId,
-                                                  String startDate,
-                                                  String endDate,
-                                                  HashMap<String, Integer> ratingMap) {
+    //COORDINATES VIEW-----------------------------------------------------------------------------------------
+    public HashMap<String, Route> startProcessingForRoutes (int userId,
+                                                                              String startDate,
+                                                                              String endDate,
+                                                                              HashMap<String, Integer> ratingMap) {
 
         ArrayList<Coordinate> coordinates =
                 (ArrayList<Coordinate>)coordinateDao.findByDate(userId, startDate, endDate, coordRawTableName, true);
-        return runAlgorithms(coordinates, ratingMap);
+        System.out.println("running algorithms.. coord size: " + coordinates.size());
+        return runAlgorithmsForRoutes(coordinates, ratingMap);
     }
 
-    private HashMap<ArrayList<Coordinate>, Integer> runAlgorithms (ArrayList<Coordinate> coordinates, HashMap<String, Integer> ratingMap) {
+
+    private HashMap<String, Route> runAlgorithmsForRoutes (ArrayList<Coordinate> coordinates,
+                                                                   HashMap<String, Integer> ratingMap) {
+        coordinates = GpsUtility.removeDuplicatesAndNoFix(coordinates);
+        coordinates = removeDuplicates(coordinates);
+
+        coordinates = keepDistanceBetween(coordinates, 2);
+        coordinates = reduceStationaryPts(coordinates, 2.0);
+        coordinates = setRatingToCoordinate(coordinates, ratingMap);
+
+        TreeMap<Integer, ArrayList<Coordinate>> map = splitRoutes(coordinates, 20);
+
+        map = removeLessDenseClustersForRoutes(map, 50);
+        map = smoothRoutes(map);
+
+        HashMap<String, Route> displayMap = sortIntoRoutesWithRating(map);
+
+        return displayMap;
+    }
+
+    //COORDINATES VIEW-----------------------------------------------------------------------------------------
+
+
+    public ArrayList<Coordinate> startProcessingForCoordinates (int userId,
+                                                                String startDate,
+                                                                String endDate,
+                                                                HashMap<String, Integer> ratingMap) {
+
+        ArrayList<Coordinate> coordinates =
+                (ArrayList<Coordinate>)coordinateDao.findByDate(userId, startDate, endDate, coordRawTableName, true);
+        return runAlgorithmsForCoordinates(coordinates, ratingMap);
+    }
+
+
+    private ArrayList<Coordinate> runAlgorithmsForCoordinates (ArrayList<Coordinate> coordinates,
+                                                                            HashMap<String, Integer> ratingMap) {
         coordinates = GpsUtility.removeDuplicatesAndNoFix(coordinates);
         coordinates = removeDuplicates(coordinates);
         coordinates = keepDistanceBetween(coordinates, 2);
-        TreeMap<Integer, ArrayList<Coordinate>> map = splitRoutes(coordinates, 5);
-        coordinates = removeLessDenseClusters(map, 30);
+//        TreeMap<Integer, ArrayList<Coordinate>> map = splitRoutes(coordinates, 5);
+//        coordinates = removeLessDenseClustersForCoordinates(map, 30);
         coordinates = setRatingToCoordinate(coordinates, ratingMap);
+        //coordinates = reduceStationaryPts(coordinates, 5.0);
+        return coordinates;
+    }
 
-        coordinates = reduceStationaryPts(coordinates, 5.0);
-        TreeMap<Integer, ArrayList<Coordinate>> routes = splitRoutes(coordinates, 120);
-        routes = removeLessDenseClusters2(routes, 30);
-        routes = smoothRoutes(routes);
 
-        ArrayList<Coordinate> storedKey = null;
 
-        HashMap<ArrayList<Coordinate>, Integer> viewMap = new HashMap<>();
+
+    private HashMap<String, Route> sortIntoRoutesWithRating (TreeMap<Integer, ArrayList<Coordinate>> routes ) {
+
+        HashMap<String, Route> displayMap = new HashMap<>();
+
         for (Map.Entry<Integer, ArrayList<Coordinate>> entry : routes.entrySet()) {
-            ArrayList<Coordinate> coordinates2 = entry.getValue();
+            ArrayList<Coordinate> coordinates = entry.getValue();
+            int routeId = entry.getKey();
+            System.out.println("route id: " + entry.getKey());
 
-            for (int i = 0; i < coordinates2.size(); i++) {
-                int currentRating = coordinates2.get(i).getRating();
+            int routeId2 = 1;
 
-                if (i < coordinates2.size() - 1) {
-                    int nextRating = coordinates2.get(i + 1).getRating();
+            for (Coordinate coordinate : coordinates) {
+                String compositeKey = "" + routeId + "," + routeId2;
 
-                    if (currentRating != nextRating && storedKey == null) {
-                        ArrayList<Coordinate> newList = new ArrayList<>();
-                        newList.add(coordinates2.get(i));
-                        newList.add(coordinates2.get(i + 1));
-                        int maxRating = getMaxRating(newList);
-                        viewMap.put(newList, maxRating);
-                        storedKey = null;
-                    } else if (currentRating != nextRating) {
-                        storedKey.add(coordinates2.get(i));
-                        storedKey.add(coordinates2.get(i + 1));
-                        int maxRating = getMaxRating(storedKey);
-                        viewMap.put(storedKey, maxRating);
-                        storedKey = null;
-                    } else if (storedKey == null){
-                        ArrayList<Coordinate> newList = new ArrayList<>();
-                        newList.add(coordinates2.get(i));
-                        storedKey = newList;
-                    } else {
-                        storedKey.add(coordinates2.get(i));
+                Route route = displayMap.get(compositeKey);
+                if (route == null) {
+                    route = new Route(new ArrayList<Coordinate>());
+                    route.addCoordinateToRoute(coordinate);
+                    displayMap.put(compositeKey, route);
+                } else {
+                    Coordinate lastCoord = route.getLastCoordinate();
+                    if (lastCoord != null) {
+                        int lastRating = lastCoord.getRating();
+                        if (lastRating == coordinate.getRating()) {
+                            route.addCoordinateToRoute(coordinate);
+                        } else {
+                            route.setRating(lastRating);
+                            route = new Route(new ArrayList<Coordinate>());
+                            route.addCoordinateToRoute(lastCoord);
+                            route.addCoordinateToRoute(coordinate);
+                            routeId2++;
+                            String compositeKey2 = "" + routeId + "," + routeId2;
+                            displayMap.put(compositeKey2, route);
+                        }
                     }
                 }
-
             }
-            storedKey = null;
         }
 
-        return viewMap;
+        return displayMap;
     }
 
     private int getMaxRating (ArrayList<Coordinate> coordinates) {
@@ -224,7 +259,7 @@ public class CoordinateService {
         return accepted;
     }
 
-    private TreeMap<Integer, ArrayList<Coordinate>> splitRoutes (ArrayList<Coordinate> coordinates, int timestampThreshold){
+    private TreeMap<Integer, ArrayList<Coordinate>> splitRoutes (ArrayList<Coordinate> coordinates, long timeThreshold){
         int routeNo = 1;
         TreeMap<Integer, ArrayList<Coordinate>> map = new TreeMap<>();
         for (int i = 0; i < coordinates.size(); i++) {
@@ -232,7 +267,8 @@ public class CoordinateService {
             if (i < coordinates.size() - 1) {
                 Coordinate nextCoordinate = coordinates.get(i + 1);
                 long timeInSec = coordinate.timeFromCurrent(nextCoordinate);
-//                System.out.println(coordinate.toString() + " time to next: " + timeInSec);
+                double distance = coordinate.distanceFrom(nextCoordinate);
+                //System.out.println("time: " + timeInSec + " dist: " + distance + " avg spd: " + avgSpd);
 
                 ArrayList<Coordinate> accepted3 = map.get(routeNo);
                 if (accepted3 == null) {
@@ -240,17 +276,21 @@ public class CoordinateService {
                     map.put(routeNo, accepted3);
                 }
 
-                if (timeInSec < timestampThreshold) {
+                if (timeInSec < timeThreshold) {
                     accepted3.add(coordinate);
                 } else {
-                    routeNo++;
+                    if (distance < 3.0) {
+                        accepted3.add(coordinate);
+                    } else {
+                        routeNo++;
+                    }
                 }
             }
         }
         return map;
     }
 
-    private ArrayList<Coordinate> removeLessDenseClusters (TreeMap<Integer, ArrayList<Coordinate>> map,
+    private ArrayList<Coordinate> removeLessDenseClustersForCoordinates (TreeMap<Integer, ArrayList<Coordinate>> map,
                                                           int densityThreshold) {
         ArrayList<Coordinate> accepted = new ArrayList<>();
         for (Map.Entry<Integer, ArrayList<Coordinate>> entry : map.entrySet()) {
@@ -263,7 +303,7 @@ public class CoordinateService {
         return accepted;
     }
 
-    private TreeMap<Integer, ArrayList<Coordinate>> removeLessDenseClusters2 (TreeMap<Integer, ArrayList<Coordinate>> map,
+    private TreeMap<Integer, ArrayList<Coordinate>> removeLessDenseClustersForRoutes (TreeMap<Integer, ArrayList<Coordinate>> map,
                                                            int densityThreshold) {
         ArrayList<Integer> intList = new ArrayList<>();
         for (Map.Entry<Integer, ArrayList<Coordinate>> entry : map.entrySet()) {
@@ -286,7 +326,6 @@ public class CoordinateService {
             String key = userId + "," + timestamp;
             Integer rating = ratingMap.get(key);
             if (rating == null) {
-                //System.out.println("NULL!" + timestamp);
                 coordinate.setRating(-1);
             } else {
                 coordinate.setRating(rating);

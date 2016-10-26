@@ -1,9 +1,6 @@
 package com.app.controller;
 
-import com.app.domain.AxisTimeFrame;
-import com.app.domain.Coordinate;
-import com.app.domain.Obstacle;
-import com.app.domain.User;
+import com.app.domain.*;
 import com.app.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.Banner;
@@ -71,20 +68,6 @@ public class FrontController {
             return mv;
         }
         mv.addObject("viewCoordinates", viewCoordinates);
-        return mv;
-    }
-
-    @RequestMapping(value = "/coordinatesView", method = RequestMethod.GET)
-    public ModelAndView toCoordinatesView() {
-        ModelAndView mv = new ModelAndView("coordinatesView", "user", new User());
-        System.out.println("Retrieving rating map...");
-//        HashMap<String, Integer> ratingMap = axisService.retrieveRatingMap();
-        HashMap<String, Integer> ratingMap = axisService.retrieveRatingMap(2, "2016-10-22 00:00", "2016-10-22 23:59");
-//        TreeMap<Integer, ArrayList<Coordinate>> coordinates = coordinateService.startProcessing(ratingMap);
-        System.out.println("processing data...");
-        HashMap<ArrayList<Coordinate>, Integer> coordinates = coordinateService.startProcessing(2, "2016-10-22 00:00", "2016-10-22 23:59" , ratingMap);
-        System.out.println("processing data...done");
-        mv.addObject("viewCoordinates", coordinates);
         return mv;
     }
 
@@ -176,6 +159,8 @@ public class FrontController {
         return new ModelAndView("redirect:landing.do");
     }
 
+    //FILTER------------------------------------------------------------------------------------------------
+
     @RequestMapping(value = "/filter-page", method = RequestMethod.GET)
     public ModelAndView toFilterPage() {
         return new ModelAndView("filter-page");
@@ -187,7 +172,7 @@ public class FrontController {
                                     @RequestParam("endDate") String endDate) {
         ModelAndView mv = new ModelAndView("filter-page");
         HashMap<String, Integer> ratingMap = axisService.retrieveRatingMap(userId, startDate, endDate);
-        HashMap<ArrayList<Coordinate>, Integer> coordinates = coordinateService.startProcessing(userId, startDate, endDate, ratingMap);
+        HashMap<String, Route> coordinates = coordinateService.startProcessingForRoutes(userId, startDate, endDate, ratingMap);
         System.out.println("coordinate size: " + coordinates.size());
         HashMap<String, Integer> dateMap = sortDateInputIntoMap(userId, startDate, endDate);
 
@@ -196,6 +181,48 @@ public class FrontController {
         return mv;
     }
 
+    @RequestMapping(value = "/routesView", method = RequestMethod.GET)
+    public ModelAndView toRoutesView() {
+        return new ModelAndView("routesView");
+    }
+
+//
+
+    @RequestMapping(value = "/process-filter-routes", method = RequestMethod.POST)
+    public ModelAndView processFilterRoutes(@RequestParam("userId") Integer userId,
+                                            @RequestParam("startDate") String startDate,
+                                            @RequestParam("endDate") String endDate) {
+        HashMap<String, Integer> ratingMap = axisService.retrieveRatingMap(userId, startDate, endDate);
+        HashMap<String, Route> coordinates = coordinateService.startProcessingForRoutes(userId, startDate, endDate, ratingMap);
+        HashMap<String, Integer> dateMap = sortDateInputIntoMap(userId, startDate, endDate);
+
+        ModelAndView mv = new ModelAndView("routesView");
+        mv.addObject("viewCoordinates", coordinates);
+        mv.addObject("dateMap", dateMap);
+        return mv;
+    }
+
+    @RequestMapping(value = "/coordinatesView", method = RequestMethod.GET)
+    public ModelAndView toCoordinatesView() {
+        return new ModelAndView("coordinatesView");
+    }
+
+    @RequestMapping(value = "/process-filter-coordinates", method = RequestMethod.POST)
+    public ModelAndView processFilterCoordinates(@RequestParam("userId") Integer userId,
+                                            @RequestParam("startDate") String startDate,
+                                            @RequestParam("endDate") String endDate) {
+
+        HashMap<String, Integer> ratingMap = axisService.retrieveRatingMap(userId, startDate, endDate);
+        ArrayList<Coordinate> coordinates = coordinateService.startProcessingForCoordinates(userId, startDate, endDate, ratingMap);
+        HashMap<String, Integer> dateMap = sortDateInputIntoMap(userId, startDate, endDate);
+
+        ModelAndView mv = new ModelAndView("coordinatesView");
+        mv.addObject("viewCoordinates", coordinates);
+        mv.addObject("dateMap", dateMap);
+        return mv;
+    }
+
+    //DATA ANALYTICS------------------------------------------------------------------------------------------------
     @GetMapping(value = "/data-analytics")
     public ModelAndView toDataAnalyticsPage() {
         ModelAndView mv = new ModelAndView("data-analytics");
@@ -204,6 +231,7 @@ public class FrontController {
         return mv;
     }
 
+    //VM DATABASE UI------------------------------------------------------------------------------------------------
     @GetMapping(value = "/database")
     public ModelAndView toDatabase() {
         ModelAndView mv = new ModelAndView("database");
