@@ -28,7 +28,8 @@
     <script src="https://use.fontawesome.com/22342cf468.js"></script>
 </head>
 
-<body onload="checkCookie()">
+<%--<body onload="checkCookie()">--%>
+<body>
     <%--Modal for login function--%>
     <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
         <div class="modal-dialog" role="document">
@@ -75,7 +76,12 @@
                         </div>
 
                         <div class="step">
-                            <center><h5>Welcome Back <b>Kevin!</b></h5></br>
+                            <%
+                                if (request.getAttribute("authUser") != null) {
+                                    User user = (User) request.getAttribute("authUser");
+                            %>
+                            <center><h5>Welcome Back! <b><%=user.getEmail()%></b></h5></br>
+                            <%}%>
                                 <div class="well">
                                     Please fill up the following questions to help us gauge the accuracy of the coloured routes.
                                 </div>
@@ -112,7 +118,6 @@
             </div>
         </div>
     </div>
-
 
     <!-- Fixed navbar -->
     <nav role="navigation" class="navbar navbar-default navbar-fixed-top">
@@ -241,7 +246,9 @@
                 e.preventDefault();
             })
 
-            $('#ratingModal').modal('toggle');
+            <%if (request.getAttribute("authUser") != null) {%>
+                $('#ratingModal').modal('toggle');
+            <%}%>
         });
 
         // Change progress bar action
