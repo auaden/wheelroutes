@@ -18,7 +18,6 @@
 </head>
 <body>
 
-    <a class="btn btn-primary" href="process-data.do">Process Data</a>
 
 </body>
 </html>

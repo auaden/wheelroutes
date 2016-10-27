@@ -436,62 +436,6 @@
                 });
             }
 
-            //for polyline view
-            <c:forEach var="entry1" items="${viewCoordinates}">
-                <c:if test="${entry1.key eq 2}">
-                    var color = "#382633";
-                </c:if>
-                <c:if test="${entry1.key eq 3}">
-                    var color = "#F75C03";
-                </c:if>
-                <c:if test="${entry1.key eq 4}">
-                    var color = "#08A045";
-                </c:if>
-                <c:if test="${entry1.key eq 5}">
-                    var color = "#9900cc";
-                </c:if>
-                <c:if test="${entry1.key eq 6}">
-                    var color = "#3E92CC";
-                </c:if>
-                <c:if test="${entry1.key eq 7}">
-                    var color = "#A72608";
-                </c:if>
-                <c:if test="${entry1.key eq 8}">
-                    var color = "#21897E";
-                </c:if>
-                <c:if test="${entry1.key eq 9}">
-                    var color = "#6F7C12";
-                </c:if>
-                <c:if test="${entry1.key eq 10}">
-                    var color = "#090C9B";
-                </c:if>
-                <c:if test="${entry1.key eq 11}">
-                    var color = "#99621E";
-                </c:if>
-                <c:if test="${entry1.key eq 99}">
-                    var color = "#69D1C5";
-                </c:if>
-
-                <c:forEach var="entry" items="${entry1.value}">
-//                    color = getRandomColor();
-                    var routeCoordinates = [
-                        <c:forEach var="mapEntry" items="${entry.value}">
-                            //coordinate
-                            {lat:${mapEntry.latitude}, lng:${mapEntry.longitude}},
-                        </c:forEach>
-                    ];
-                    var route = new google.maps.Polyline({
-                        path: routeCoordinates,
-                        strokeOpacity: 1,
-                        strokeColor: color,
-                        strokeWeight: 5,
-                        title: "Userid: ${entry1.key}"
-                    });
-                    route.setMap(map);
-                </c:forEach>
-            </c:forEach>
-
-
             function getRandomColor() {
                 var letters = '0123456789ABCDEF';
                 var color = '#';

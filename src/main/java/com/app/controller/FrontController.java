@@ -42,37 +42,13 @@ public class FrontController {
     @RequestMapping(value = "/landing", method = RequestMethod.GET)
     public ModelAndView toLanding() {
         ModelAndView mv = new ModelAndView("landing", "user", new User());
-
-        //retrieve processed view coordinates
-        HashMap<Integer, HashMap<Integer, ArrayList<Coordinate>>>  viewCoordinates = coordinateService.retrieveViewCoordinates(true);
-//        HashMap<Integer, HashMap<Integer, ArrayList<Coordinate>>>  viewCoordinates = coordinateService.processData();
-        //retrieve obstacles
         ArrayList<Obstacle> obstacles = obstacleService.retrieveAll();
-        if (viewCoordinates == null) {
-            mv.setViewName("error");
-            return mv;
-        }
-        mv.addObject("viewCoordinates", viewCoordinates);
         mv.addObject("obstacles", obstacles);
         return mv;
     }
 
-    @RequestMapping(value = "/raw-data", method = RequestMethod.GET)
-    public ModelAndView rawData() {
-
-        ModelAndView mv = new ModelAndView("landing", "user", new User());
-        // false to retrieve raw data
-        HashMap<Integer, HashMap<Integer, ArrayList<Coordinate>>>  viewCoordinates = coordinateService.retrieveViewCoordinates(false);
-        if (viewCoordinates == null) {
-            mv.setViewName("error");
-            return mv;
-        }
-        mv.addObject("viewCoordinates", viewCoordinates);
-        return mv;
-    }
-
     @RequestMapping(value = "/admin", method = RequestMethod.GET)
-    public ModelAndView toAdminPage(Model model) {
+    public ModelAndView toAdminPage() {
         ModelAndView mv = new ModelAndView("admin");
         return mv;
     }
@@ -161,25 +137,6 @@ public class FrontController {
 
     //FILTER------------------------------------------------------------------------------------------------
 
-    @RequestMapping(value = "/filter-page", method = RequestMethod.GET)
-    public ModelAndView toFilterPage() {
-        return new ModelAndView("filter-page");
-    }
-
-    @RequestMapping(value = "/process-filter", method = RequestMethod.POST)
-    public ModelAndView processTest(@RequestParam("userId") Integer userId,
-                                    @RequestParam("startDate") String startDate,
-                                    @RequestParam("endDate") String endDate) {
-        ModelAndView mv = new ModelAndView("filter-page");
-        HashMap<String, Integer> ratingMap = axisService.retrieveRatingMap(userId, startDate, endDate);
-        HashMap<String, Route> coordinates = coordinateService.startProcessingForRoutes(userId, startDate, endDate, ratingMap);
-        System.out.println("coordinate size: " + coordinates.size());
-        HashMap<String, Integer> dateMap = sortDateInputIntoMap(userId, startDate, endDate);
-
-        mv.addObject("viewCoordinates", coordinates);
-        mv.addObject("dateMap", dateMap);
-        return mv;
-    }
 
     @RequestMapping(value = "/routesView", method = RequestMethod.GET)
     public ModelAndView toRoutesView() {
