@@ -81,7 +81,7 @@ public class CoordinateService {
     }
 
     public void processRestData(ArrayList<Coordinate> coordinates) {
-        coordinateDao.insertRawBatch(coordinates, coordRawTableName);
+
 //        coordinates = GpsUtility.removeDuplicatesAndNoFix(coordinates);
 //        HashMap<String, ArrayList<Coordinate>> sortedCoordinateMap = GpsUtility.sortCoordinatesIntoMap(coordinates);
 //

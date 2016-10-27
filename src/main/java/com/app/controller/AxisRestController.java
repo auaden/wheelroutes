@@ -3,6 +3,7 @@ package com.app.controller;
 import com.app.Utility.GpsUtility;
 import com.app.dao.AxisDao;
 import com.app.domain.Axis;
+import com.app.domain.AxisRest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -28,15 +29,18 @@ public class AxisRestController {
     private String axisRawTableName;
 
     @RequestMapping(value = "/axes", method= RequestMethod.POST)
-    public void save(@RequestBody List<Axis> axes) {
-        ArrayList<Axis> test = new ArrayList<>();
-        for (Axis axis : axes) {
-            long ts = axis.getTimestamp().getTime() - (1000 * 60 * 60 * 8);
-            Timestamp newTs = new Timestamp(ts);
-            axis.setTimestamp(newTs);
-            test.add(axis);
+    public void save(@RequestBody List<AxisRest> axes) {
+        ArrayList<Axis> filteredAxes = new ArrayList<>();
+        for (AxisRest axisRest : axes) {
+            int userId = axisRest.getUserId();
+            Timestamp ts = Timestamp.valueOf(axisRest.getTimestamp());
+            double x = axisRest.getxAxis();
+            double y = axisRest.getyAxis();
+            double z = axisRest.getzAxis();
+
+            filteredAxes.add(new Axis(userId, ts, x, y, z));
         }
-        axisDao.insertBatch(test, axisRawTableName);
+        axisDao.insertBatch(filteredAxes, axisRawTableName);
     }
 
     @RequestMapping(value = "/axes", method=RequestMethod.GET)

@@ -3,6 +3,7 @@ package com.app.controller;
 import com.app.Utility.GpsUtility;
 import com.app.dao.CoordinateDao;
 import com.app.domain.Coordinate;
+import com.app.domain.CoordinateRest;
 import com.app.service.CoordinateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,6 +31,9 @@ public class CoordinateRestController {
     private CoordinateService coordinateService;
 
     @Autowired
+    private String coordRawTableName;
+
+    @Autowired
     private String coordProcessedTableName;
 
     @RequestMapping(value="/{tableName}", method=RequestMethod.DELETE)
@@ -39,17 +43,22 @@ public class CoordinateRestController {
     }
 
     @RequestMapping(value = "/coordinates", method= RequestMethod.POST)
-    public void save(@RequestBody List<Coordinate> coordinates) {
+    public void save(@RequestBody List<CoordinateRest> coordinates) {
         System.out.println("RESTED.. SAVE");
         ArrayList<Coordinate> filteredCoordinates = new ArrayList<>();
-        for (Coordinate coordinate : coordinates) {
-            long ts = coordinate.getTimestamp().getTime() - (1000 * 60 * 60 * 8);
-            Timestamp newTs = new Timestamp(ts);
-            coordinate.setTimestamp(newTs);
+        for (CoordinateRest coordinateRest : coordinates) {
+            System.out.println("timestamp: " + coordinateRest.getTimestamp());
+            int userId = coordinateRest.getUserId();
+            Timestamp ts = Timestamp.valueOf(coordinateRest.getTimestamp());
+            double lat = coordinateRest.getLatitude();
+            double lng = coordinateRest.getLongitude();
+            int numSat = coordinateRest.getNumSat();
+            Coordinate coordinate = new Coordinate(userId, ts, lat, lng, numSat);
             filteredCoordinates.add(coordinate);
         }
 
-        coordinateService.processRestData(filteredCoordinates);
+        coordinateDao.insertRawBatch(filteredCoordinates, coordRawTableName);
+        //coordinateService.processRestData(filteredCoordinates);
     }
 
     @RequestMapping(value = "/coordinates", method=RequestMethod.GET)
