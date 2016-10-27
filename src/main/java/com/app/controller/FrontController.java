@@ -42,7 +42,7 @@ public class FrontController {
     @RequestMapping(value = "/landing", method = RequestMethod.GET)
     public ModelAndView toLanding() {
         ModelAndView mv = new ModelAndView("landing", "user", new User());
-        ArrayList<Obstacle> obstacles = obstacleService.retrieveAll();
+        ArrayList<Obstacle> obstacles = obstacleService.retrieveAllApproved();
         mv.addObject("obstacles", obstacles);
         return mv;
     }
@@ -50,6 +50,8 @@ public class FrontController {
     @RequestMapping(value = "/admin", method = RequestMethod.GET)
     public ModelAndView toAdminPage() {
         ModelAndView mv = new ModelAndView("admin");
+        ArrayList<Obstacle> unapprovedObstacles = obstacleService.findAllUnapproved();
+        mv.addObject("unapprovedObstacles", unapprovedObstacles);
         return mv;
     }
 
@@ -134,6 +136,15 @@ public class FrontController {
         obstacleService.save(email, currentTs, description, Double.parseDouble(lat), Double.parseDouble(lng), file);
         return new ModelAndView("redirect:landing.do");
     }
+
+    @RequestMapping(value = "/process-approve-obstacle", method = RequestMethod.POST)
+    public ModelAndView processApproveObstacle(@RequestParam("email") String email,
+                                               @RequestParam("lat") String lat,
+                                               @RequestParam("lng") String lng) {
+        obstacleService.approveObstacle(email, Double.parseDouble(lat), Double.parseDouble(lng));
+        return new ModelAndView("redirect:admin.do");
+    }
+
 
     //FILTER------------------------------------------------------------------------------------------------
 

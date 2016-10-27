@@ -29,7 +29,7 @@ public class ObstacleDao {
         List<Obstacle> obstacles;
         try {
             obstacles = jdbcTemplate.query(
-                    "select * from " + tableName, new RowMapper<Obstacle>() {
+                    "select * from " + tableName + " where approved = true", new RowMapper<Obstacle>() {
                         public Obstacle mapRow(ResultSet resultSet, int rowNum) throws SQLException {
                             Obstacle obstacle = new Obstacle();
                             obstacle.setEmail(resultSet.getString("email"));
@@ -50,6 +50,33 @@ public class ObstacleDao {
         }
         return obstacles;
     }
+
+    public List<Obstacle> findAllUnapproved() {
+        List<Obstacle> obstacles;
+        try {
+            obstacles = jdbcTemplate.query(
+                    "select * from obstacle where approved = false", new RowMapper<Obstacle>() {
+                        public Obstacle mapRow(ResultSet resultSet, int rowNum) throws SQLException {
+                            Obstacle obstacle = new Obstacle();
+                            obstacle.setEmail(resultSet.getString("email"));
+                            obstacle.setTimestamp(Timestamp.valueOf(resultSet.getString("timestamp")));
+                            obstacle.setDescription(resultSet.getString("description"));
+                            obstacle.setLatitude(resultSet.getDouble("latitude"));
+                            obstacle.setLongitude(resultSet.getDouble("longitude"));
+                            obstacle.setImage(resultSet.getBytes("image"));
+                            obstacle.setApproved(resultSet.getBoolean("approved"));
+                            return obstacle;
+                        }
+                    });
+
+        } catch (IllegalArgumentException iae) {
+            System.out.println("illegal argument exception");
+            iae.printStackTrace();
+            return null;
+        }
+        return obstacles;
+    }
+
 
     public Obstacle find(double lat, double lng) {
         Map<String, Double> paramMap = new HashMap<>();
@@ -96,6 +123,10 @@ public class ObstacleDao {
                 }
         );
         if (count !=1 ) throw new InsertFailedException("Cannot insert Account");
+    }
+
+    public void delete(String email, double lat, double lng) {
+        int count = jdbcTemplate.update("delete from obstacle where email = '" + email + "' and latitude = " +lat + " and longitude = " + lng);
     }
 
 }

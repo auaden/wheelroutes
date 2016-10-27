@@ -20,7 +20,7 @@ public class ObstacleService {
     @Autowired
     private ObstacleDao obstacleDao;
 
-    public ArrayList<Obstacle> retrieveAll() {
+    public ArrayList<Obstacle> retrieveAllApproved() {
         return (ArrayList<Obstacle>) obstacleDao.findAll("obstacle");
     }
 
@@ -32,11 +32,6 @@ public class ObstacleService {
                      MultipartFile imageFile) {
 
         byte[] imageBytes= null;
-        System.out.println(email);
-        System.out.println(timestamp);
-        System.out.println(description);
-        System.out.println(lat);
-        System.out.println(lat);
         try {
             imageBytes = imageFile.getBytes();
         } catch (IOException e) {
@@ -47,6 +42,8 @@ public class ObstacleService {
         obstacleDao.insert(obstacle);
     }
 
+    public ArrayList<Obstacle> findAllUnapproved() {return (ArrayList<Obstacle>) obstacleDao.findAllUnapproved();}
+
     public byte[] getImage(double lat, double lng) {
         Obstacle obstacle = obstacleDao.find(lat, lng);
         if (obstacle == null) {
@@ -55,4 +52,12 @@ public class ObstacleService {
             return obstacle.getImage();
         }
     }
+
+    public void approveObstacle(String email, double lat, double lng) {
+        Obstacle prevObs = obstacleDao.find(lat,lng);
+        prevObs.setApproved(true);
+        obstacleDao.delete(email, lat, lng);
+        obstacleDao.insert(prevObs);
+    }
+
 }

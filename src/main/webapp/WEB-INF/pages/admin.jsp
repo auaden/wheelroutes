@@ -17,6 +17,40 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 </head>
 <body>
+    <h1>FILTER: </h1>
+    <a class="btn btn-default" href="/routesView.do">View by routes</a> <br>
+    <a class="btn btn-default" href="/coordinatesView.do">View by coordinates (playable)</a>
+
+    <table border="1">
+        <tr>
+            <th>Email</th>
+            <th>Timestamp</th>
+            <th>Obstacle</th>
+            <th>Description</th>
+            <th>Approved?</th>
+            <th>Action</th>
+        </tr>
+        <tr>
+            <c:forEach var="entry" items="${unapprovedObstacles}">
+                <td>${entry.email}</td>
+                <td>${entry.timestamp}</td>
+                <td><img src="http://localhost:8080/rest/obstacle/${entry.latitude}/${entry.longitude}/" style="width:200px; height:200px"></td>
+                <td>${entry.description}</td>
+                <td>${entry.approved}</td>
+                <td>
+                    <form action="/process-approve-obstacle.do" method="post">
+                        <input type="hidden" name="email" value="${entry.email}">
+                        <input type="hidden" name="lat" value="${entry.latitude}">
+                        <input type="hidden" name="lng" value="${entry.longitude}">
+                        <input type="submit" value="APPROVE" >
+                    </form>
+                </td>
+            </c:forEach>
+        </tr>
+
+
+    </table>
+
 
 
 </body>

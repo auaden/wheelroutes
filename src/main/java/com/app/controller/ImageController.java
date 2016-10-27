@@ -32,6 +32,7 @@ public class ImageController {
         headers.setContentType(MediaType.IMAGE_PNG);
 
         byte[] image = obstacleService.getImage(Double.valueOf(latitude), Double.valueOf(longitude));
+        System.out.println(image);
         if (image == null) {
             return ResponseEntity.badRequest().body(image);
         } else {
