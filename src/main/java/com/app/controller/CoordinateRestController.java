@@ -48,17 +48,19 @@ public class CoordinateRestController {
         ArrayList<Coordinate> filteredCoordinates = new ArrayList<>();
         for (CoordinateRest coordinateRest : coordinates) {
             System.out.println("timestamp: " + coordinateRest.getTimestamp());
-            int userId = coordinateRest.getUserId();
-            Timestamp ts = Timestamp.valueOf(coordinateRest.getTimestamp());
-            double lat = coordinateRest.getLatitude();
-            double lng = coordinateRest.getLongitude();
-            int numSat = coordinateRest.getNumSat();
-            Coordinate coordinate = new Coordinate(userId, ts, lat, lng, numSat);
-            filteredCoordinates.add(coordinate);
+            if (!coordinateRest.getTimestamp().equals("0")) {
+                int userId = coordinateRest.getUserId();
+                Timestamp ts = Timestamp.valueOf(coordinateRest.getTimestamp());
+                double lat = coordinateRest.getLatitude();
+                double lng = coordinateRest.getLongitude();
+                int numSat = coordinateRest.getNumSat();
+                filteredCoordinates.add(new Coordinate(userId, ts, lat, lng, numSat));
+            }
         }
-
+        for (Coordinate c : filteredCoordinates) {
+            System.out.println(c.toString());
+        }
         coordinateDao.insertRawBatch(filteredCoordinates, coordRawTableName);
-        //coordinateService.processRestData(filteredCoordinates);
     }
 
     @RequestMapping(value = "/coordinates", method=RequestMethod.GET)

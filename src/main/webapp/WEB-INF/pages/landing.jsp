@@ -424,7 +424,7 @@
                         '<p><b>Description:</b></p>' +
                         '<p>' + desc + '</p>' +
                         '<b>Timestamp: </b>' + ts +
-                        '<p><center><img src="http://wheelroutes-humblebees.rhcloud.com/rest/obstacle/'+ lat + '/' + lng + '/"  style="width:200px; height:200px"/></center><p>' +
+                        '<p><center><img src="http://wheelroutes.icitylab.com/rest/obstacle/'+ lat + '/' + lng + '/"  style="width:200px; height:200px"/></center><p>' +
                         '</div></div>';
 
                 var infowindow = new google.maps.InfoWindow({

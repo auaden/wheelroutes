@@ -32,13 +32,14 @@ public class AxisRestController {
     public void save(@RequestBody List<AxisRest> axes) {
         ArrayList<Axis> filteredAxes = new ArrayList<>();
         for (AxisRest axisRest : axes) {
-            int userId = axisRest.getUserId();
-            Timestamp ts = Timestamp.valueOf(axisRest.getTimestamp());
-            double x = axisRest.getxAxis();
-            double y = axisRest.getyAxis();
-            double z = axisRest.getzAxis();
-
-            filteredAxes.add(new Axis(userId, ts, x, y, z));
+            if (!axisRest.getTimestamp().equals("0")) {
+                int userId = axisRest.getUserId();
+                Timestamp ts = Timestamp.valueOf(axisRest.getTimestamp());
+                double x = axisRest.getxAxis();
+                double y = axisRest.getyAxis();
+                double z = axisRest.getzAxis();
+                filteredAxes.add(new Axis(userId, ts, x, y, z));
+            }
         }
         axisDao.insertBatch(filteredAxes, axisRawTableName);
     }
@@ -52,6 +53,15 @@ public class AxisRestController {
     public ModelAndView getListFromTable(@PathVariable String tableName)  {
         ModelAndView mv = new ModelAndView("database");
         ArrayList<Axis> data = (ArrayList<Axis>)axisDao.findAll(tableName);
+        mv.addObject("axisData", data);
+        return mv;
+    }
+
+    @RequestMapping(value = "/{userId}/{tableName}", method=RequestMethod.GET)
+    public ModelAndView getListFromTableAndId(@PathVariable(value="userId") int userId,
+                                              @PathVariable(value="tableName") String tableName)  {
+        ModelAndView mv = new ModelAndView("database");
+        ArrayList<Axis> data = (ArrayList<Axis>) axisDao.findAllById(userId, tableName);
         mv.addObject("axisData", data);
         return mv;
     }

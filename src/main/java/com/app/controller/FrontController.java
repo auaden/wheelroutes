@@ -160,7 +160,9 @@ public class FrontController {
     public ModelAndView processFilterRoutes(@RequestParam("userId") Integer userId,
                                             @RequestParam("startDate") String startDate,
                                             @RequestParam("endDate") String endDate) {
+        //timestamp, rating
         HashMap<String, Integer> ratingMap = axisService.retrieveRatingMap(userId, startDate, endDate);
+
         HashMap<String, Route> coordinates = coordinateService.startProcessingForRoutes(userId, startDate, endDate, ratingMap);
         HashMap<String, Integer> dateMap = sortDateInputIntoMap(userId, startDate, endDate);
 

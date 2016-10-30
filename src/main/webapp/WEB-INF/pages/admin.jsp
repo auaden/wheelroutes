@@ -9,6 +9,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ page isELIgnored="false" %>
 <html>
 <head>
     <title>Admin Page</title>
@@ -30,11 +31,12 @@
             <th>Approved?</th>
             <th>Action</th>
         </tr>
+
+        <c:forEach var="entry" items="${unapprovedObstacles}">
         <tr>
-            <c:forEach var="entry" items="${unapprovedObstacles}">
                 <td>${entry.email}</td>
                 <td>${entry.timestamp}</td>
-                <td><img src="http://localhost:8080/rest/obstacle/${entry.latitude}/${entry.longitude}/" style="width:200px; height:200px"></td>
+                <td><img src="http://wheelroutes.icitylab.com/rest/obstacle/${entry.latitude}/${entry.longitude}/" style="width:200px; height:200px"></td>
                 <td>${entry.description}</td>
                 <td>${entry.approved}</td>
                 <td>
@@ -45,9 +47,8 @@
                         <input type="submit" value="APPROVE" >
                     </form>
                 </td>
-            </c:forEach>
         </tr>
-
+        </c:forEach>
 
     </table>
 
