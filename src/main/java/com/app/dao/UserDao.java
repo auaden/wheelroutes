@@ -42,13 +42,13 @@ public class UserDao {
     public void insert(User user, int sensitivity) {
         PreparedStatementCreatorFactory preparedStatementCreatorFactory =
                 new PreparedStatementCreatorFactory(
-                        "INSERT INTO \"user\" (email, password, sensitivity) values(?,?,?)",
-                        new int[] {Types.VARCHAR, Types.VARCHAR, Types.INTEGER}
+                        "INSERT INTO \"user\" (email, password, exppain, havebalance, sensitivity) values(?,?,?,?,?)",
+                        new int[] {Types.VARCHAR, Types.VARCHAR, Types.BOOLEAN, Types.BOOLEAN, Types.INTEGER}
                 );
 
         int count = jdbcTemplate.update(
                 preparedStatementCreatorFactory.newPreparedStatementCreator(new Object[] {
-                        user.getEmail(), user.getPassword()}));
+                        user.getEmail(), user.getPassword(), user.isExpPain(), user.isHaveBalance(), sensitivity}));
 
         if (count !=1 ) throw new InsertFailedException("Cannot insert Account");
     }

@@ -64,11 +64,11 @@
                 </div>
             </div>
             <div class="form-group">
-                <h4><label for="spinalCordInjury" class="col-sm-offset-1 col-sm-4 control-label">Are you a spinal cord injury patient?</label></h4>
+                <h4><label for="exppain" class="col-sm-offset-1 col-sm-4 control-label">I experience pain going over bumps</label></h4>
                 <input class="col-sm-offset-3 col-sm-2" type="checkbox" data-toggle="toggle" data-on="Yes" data-off="No">
             </div>
             <div class="form-group">
-                <h4><label for="bump" class="col-sm-offset-1 col-sm-4 control-label">Does your body posture changes when you encounter a bump?</label></h4>
+                <h4><label for="havebalance" class="col-sm-offset-1 col-sm-4 control-label">I have poor sitting balance</label></h4>
                 <input class="col-sm-offset-3 col-sm-2" type="checkbox" data-toggle="toggle" data-on="Yes" data-off="No">
             </div>
             <div class="form-group">

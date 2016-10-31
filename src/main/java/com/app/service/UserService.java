@@ -31,7 +31,7 @@ public class UserService {
 
         return errorMsg;
     }
-
+    /*
     public String register(User user) {
         String errorMsg = null;
         String email = user.getEmail().trim();
@@ -51,12 +51,13 @@ public class UserService {
         
         userDao.insert(user);
         return errorMsg;
-    }
+    }*/
     
-    public String register(User user, int sensitivity) {
+    public String register(User user) {
         String errorMsg = null;
         String email = user.getEmail().trim();
         String password = user.getPassword().trim();
+        int sensitivity = 0;
 
         if (email.length() == 0 || password.length() == 0) {
             errorMsg = "Please fill in all the blanks";
@@ -70,6 +71,13 @@ public class UserService {
             return errorMsg;
         }
         
+        if (user.isExpPain()) { //Experiences pain
+            sensitivity += 35;
+        }
+        if (!user.isHaveBalance()) { //Poor sitting balance
+            sensitivity += 35;
+        }
+        
         userDao.insert(user, sensitivity);
         return errorMsg;
     }
@@ -77,9 +85,9 @@ public class UserService {
     //difference 
     public void modifySensitivity(User user, int sensitivityAdjust) {
         if (sensitivityAdjust > 0) {
-            userDao.modifySensitivity(user, 1); //increase
+            userDao.modifySensitivity(user, 5); //increase
         } else {
-            userDao.modifySensitivity(user, -1); //decrease
+            userDao.modifySensitivity(user, -5); //decrease
         }
     }
     

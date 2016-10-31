@@ -6,6 +6,8 @@ package com.app.domain;
 public class User {
     private String email;
     private String password;
+    private boolean expPain;
+    private boolean haveBalance;
     private int sensitivity;
 
     public User(){
@@ -40,4 +42,20 @@ public class User {
         this.sensitivity = sensitivity;
     }
 
+    public boolean isExpPain() {
+        return expPain;
+    }
+
+    public boolean isHaveBalance() {
+        return haveBalance;
+    }
+
+    public void setExpPain(boolean expPain) {
+        this.expPain = expPain;
+    }
+
+    public void setHaveBalance(boolean haveBalance) {
+        this.haveBalance = haveBalance;
+    }
+    
 }
