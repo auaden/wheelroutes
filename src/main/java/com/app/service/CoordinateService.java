@@ -28,55 +28,30 @@ public class CoordinateService {
     @Autowired
     public String coordProcessedTableName;
 
-    public HashMap<Integer, HashMap<Integer, ArrayList<Coordinate>>> retrieveViewCoordinates(boolean isViewTable) {
-        String tableName = "";
-        ArrayList<Coordinate> coordinates;
-        if (isViewTable) {
-            tableName = coordProcessedTableName;
-            coordinates = (ArrayList<Coordinate>)coordinateDao.findAll(tableName, false);
-        } else {
-            tableName = coordRawTableName;
-            coordinates = (ArrayList<Coordinate>)coordinateDao.findAll(tableName, true);
-        }
-
-        if (coordinates == null) {
-            return null;
-        }
-        coordinates = GpsUtility.removeDuplicatesAndNoFix(coordinates);
-        //test filtering stationery points
-
-        HashMap<Integer, HashMap<Integer, ArrayList<Coordinate>>> sortedCoordinates = GpsUtility.sortCoordinates(coordinates);
-        return sortedCoordinates;
+    public HashMap<String, Route> retrieveViewCoordinates() {
+        ArrayList<Coordinate> coordinates = (ArrayList<Coordinate>) coordinateDao.findAll(coordProcessedTableName, false);
+        TreeMap<Integer, ArrayList<Coordinate>> map = splitRoutes(coordinates, 20);
+        HashMap<String, Route> displayMap = sortIntoRoutesWithRating(map);
+        return displayMap;
     }
 
-    public void processData(HashMap<String, Integer> ratingMap) {
-        ArrayList<Coordinate> coordinates = (ArrayList<Coordinate>)coordinateDao.findAll(coordRawTableName, true);
-        if (coordinates == null) {
-            return;
-        }
+    public HashMap<String, Route> retrieveViewCoordinates(int userId) {
+        ArrayList<Coordinate> coordinates = (ArrayList<Coordinate>) coordinateDao.findById(userId, coordProcessedTableName, false);
+        TreeMap<Integer, ArrayList<Coordinate>> map = splitRoutes(coordinates, 20);
+        HashMap<String, Route> displayMap = sortIntoRoutesWithRating(map);
+        return displayMap;
+    }
 
-        coordinates = GpsUtility.removeDuplicatesAndNoFix(coordinates);
-
-        HashMap<String, ArrayList<Coordinate>> sortedCoordinateMap = GpsUtility.sortCoordinatesIntoMap(coordinates);
-
-        for (Map.Entry<String, ArrayList<Coordinate>> entry : sortedCoordinateMap.entrySet()) {
-            String compositeKey = entry.getKey();
-            ArrayList<Coordinate> coordinatesList = entry.getValue();
-
-            for (Coordinate coordinate : coordinatesList) {
-                Timestamp timestamp = coordinate.getTimestamp();
-                int userId = coordinate.getUserId();
-                String key = userId + "," + timestamp;
-                Integer rating = ratingMap.get(key);
-                if (rating == null) {
-                    //System.out.println("NULL!" + timestamp);
-                    coordinate.setRating(-1);
-                } else {
-                    coordinate.setRating(rating);
-                }
-            }
-
-            applyLogicAndInsert(coordinatesList);
+    public void processData(int userId, String startDate, String endDate, HashMap<String, Integer> ratingMap) {
+        ArrayList<Coordinate> coordinates =
+                (ArrayList<Coordinate>)coordinateDao.findByDate(userId, startDate, endDate, coordRawTableName, true);
+        System.out.println("running algorithms for routes.. coord size: " + coordinates.size());
+        HashMap<String, Route> result = runAlgorithmsForRoutes(coordinates, ratingMap);
+        for (Map.Entry<String, Route> entry : result.entrySet()) {
+            System.out.println("key : " + entry.getKey() + " , " + entry.getValue());
+            Route route = entry.getValue();
+            ArrayList<Coordinate> routeCoords = route.getRoute();
+            coordinateDao.insertBatch(routeCoords, coordProcessedTableName);
         }
     }
 
@@ -90,19 +65,6 @@ public class CoordinateService {
 //            ArrayList<Coordinate> coordinatesList = entry.getValue();
 //            applyLogicAndInsert(coordinatesList);
 //        }
-    }
-
-    private void applyLogicAndInsert(ArrayList<Coordinate> coordinatesList) {
-        double avgSpd = GpsUtility.calculateRouteAvgSpd(coordinatesList);
-        if (coordinatesList.size() > 100 && avgSpd <3) {
-            coordinatesList = GpsUtility.applyKalmanFiltering(coordinatesList, 1, 10);
-            coordinateDao.insertBatch(coordinatesList, coordProcessedTableName);
-        }
-    }
-
-    public HashMap<Integer, HashMap<Integer, ArrayList<Coordinate>>> retrieveDataByDateAndUserId(int userId, String startDate, String endDate) {
-        ArrayList<Coordinate> coordinates = (ArrayList<Coordinate>) coordinateDao.findByDate(userId, startDate, endDate, coordProcessedTableName, false);
-        return GpsUtility.sortCoordinates(coordinates);
     }
 
     public TreeMap<Integer, TreeMap<String, Integer>> retrieveOverallCoordData() {
@@ -121,7 +83,7 @@ public class CoordinateService {
 
         ArrayList<Coordinate> coordinates =
                 (ArrayList<Coordinate>)coordinateDao.findByDate(userId, startDate, endDate, coordRawTableName, true);
-        System.out.println("running algorithms.. coord size: " + coordinates.size());
+        System.out.println("running algorithms for routes.. coord size: " + coordinates.size());
         return runAlgorithmsForRoutes(coordinates, ratingMap);
     }
 
@@ -145,6 +107,11 @@ public class CoordinateService {
         return displayMap;
     }
 
+
+
+
+
+
     //COORDINATES VIEW-----------------------------------------------------------------------------------------
 
 
@@ -164,15 +131,12 @@ public class CoordinateService {
         coordinates = GpsUtility.removeDuplicatesAndNoFix(coordinates);
         coordinates = removeDuplicates(coordinates);
         coordinates = keepDistanceBetween(coordinates, 2);
-//        TreeMap<Integer, ArrayList<Coordinate>> map = splitRoutes(coordinates, 5);
-//        coordinates = removeLessDenseClustersForCoordinates(map, 30);
+        TreeMap<Integer, ArrayList<Coordinate>> map = splitRoutes(coordinates, 5);
+        coordinates = removeLessDenseClustersForCoordinates(map, 30);
         coordinates = setRatingToCoordinate(coordinates, ratingMap);
-        //coordinates = reduceStationaryPts(coordinates, 5.0);
+        coordinates = reduceStationaryPts(coordinates, 5.0);
         return coordinates;
     }
-
-
-
 
     private HashMap<String, Route> sortIntoRoutesWithRating (TreeMap<Integer, ArrayList<Coordinate>> routes ) {
 
@@ -214,17 +178,6 @@ public class CoordinateService {
         }
 
         return displayMap;
-    }
-
-    private int getMaxRating (ArrayList<Coordinate> coordinates) {
-        int maxRating = 0;
-        for (Coordinate coordinate : coordinates) {
-            int rating = coordinate.getRating();
-            if (rating > maxRating) {
-                maxRating = rating;
-            }
-        }
-        return maxRating;
     }
 
     private ArrayList<Coordinate> removeDuplicates (ArrayList<Coordinate> coordinates) {

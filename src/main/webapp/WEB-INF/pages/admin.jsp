@@ -21,6 +21,7 @@
     <h1>FILTER: </h1>
     <a class="btn btn-default" href="/routesView.do">View by routes</a> <br>
     <a class="btn btn-default" href="/coordinatesView.do">View by coordinates (playable)</a>
+    <a class="btn btn-default" href="/process-data.do">Process Data</a>
 
     <table border="1">
         <tr>

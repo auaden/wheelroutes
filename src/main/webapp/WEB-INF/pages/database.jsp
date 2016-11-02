@@ -14,7 +14,6 @@
 </head>
 <body>
 
-
     <table border="1">
         <tr>
             <th>User Id</th>

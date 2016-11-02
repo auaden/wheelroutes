@@ -339,6 +339,36 @@
                 ]
             });
 
+            var Colors = [
+                "#000000",
+                "#07cc04",
+                "#99ff33",
+                "#ccff33",
+                "#ffff00",
+                "#ff9933",
+                "#ff751a",
+                "#db2902"
+            ];
+
+            <c:forEach var="entry1" items="${viewRoutes}">
+            var rating = ${entry1.value.rating} + 1
+            var routeCoordinates = [
+                <c:forEach var="mapEntry" items="${entry1.value.route}">
+                //coordinate
+                {lat:${mapEntry.latitude}, lng:${mapEntry.longitude}},
+                </c:forEach>
+            ];
+
+            var route = new google.maps.Polyline({
+                path: routeCoordinates,
+                strokeOpacity: 1,
+                strokeColor: Colors[rating],
+                strokeWeight: 5
+            });
+            route.setMap(map);
+            </c:forEach>
+
+
             //FOR SEARCH FUNCTION IN NAVBAR
             var geocoder = new google.maps.Geocoder();
 

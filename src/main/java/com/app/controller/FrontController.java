@@ -43,6 +43,8 @@ public class FrontController {
     public ModelAndView toLanding() {
         ModelAndView mv = new ModelAndView("landing", "user", new User());
         ArrayList<Obstacle> obstacles = obstacleService.retrieveAllApproved();
+        HashMap<String, Route> displayMap = coordinateService.retrieveViewCoordinates();
+        mv.addObject("viewRoutes", displayMap);
         mv.addObject("obstacles", obstacles);
         return mv;
     }
@@ -68,8 +70,8 @@ public class FrontController {
         String errorMsg = userService.login(user);
         if (errorMsg != null) {
             mv.setViewName("landing");
-            HashMap<Integer, HashMap<Integer, ArrayList<Coordinate>>>  viewCoordinates = coordinateService.retrieveViewCoordinates(true);
-            mv.addObject("viewCoordinates", viewCoordinates);
+            //HashMap<Integer, HashMap<Integer, ArrayList<Coordinate>>>  viewCoordinates = coordinateService.retrieveViewCoordinates(true);
+            //mv.addObject("viewCoordinates", viewCoordinates);
             mv.addObject("errorMsg", errorMsg);
         } else {
             if (user.getEmail().substring(0,5).equals("admin")) {
@@ -117,8 +119,10 @@ public class FrontController {
     @RequestMapping(value = "/process-data", method = RequestMethod.GET)
     public ModelAndView processData() {
         ModelAndView mv = new ModelAndView();
-        HashMap<String, Integer> ratingMap = axisService.retrieveRatingMap();
-        coordinateService.processData(ratingMap);
+
+        //23 sep to nov 1
+        HashMap<String, Integer> ratingMap = axisService.retrieveRatingMap(9, "2016-10-06 00:00", "2016-10-06 23:59");
+        coordinateService.processData(9, "2016-10-06 00:00", "2016-10-06 23:59",ratingMap);
         mv.setViewName("redirect:landing.do");
         return mv;
     }
