@@ -54,7 +54,7 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="Redirect()">Not Registered?</button>
                         <!--<a href="/register.do"><button class="btn center">Not registered?</button></a>-->
-                        <input type="submit" class="btn btn-primary" value="Sign in"/>
+                        <input type="submit" class="btn btn-warning" value="Sign in" style="color:default"/>
                     </div>
                 </form:form>
             </div>
@@ -168,9 +168,9 @@
                             <%
                                 }else{
                             %>
-                                <a href="/process-logout.do"><button class="btn btn-danger" type="button" id="logout">Logout</button></a>
+                                <a href="/process-logout.do"><button class="btn btn-default" type="button" id="logout">Logout</button></a>
                             <%}%>
-                            <button class="btn btn-primary" type="button" id="drop" onclick="initMap.drop()">
+                            <button class="btn btn-warning" type="button" id="drop" onclick="initMap.drop()" style="color:default">
                                 Obstacle Reported
                             </button>
                         </div>

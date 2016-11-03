@@ -63,9 +63,15 @@
                 <a class="navbar-brand" href="#"><i class="fa fa-wheelchair fa-2x" aria-hidden="true"></i>WheelRoutes</a>
             </div>
             <div id="collapse navbar-collapse" class="collapse navbar-collapse">
-                <ul class="nav navbar-nav navbar-right col-lg-3 col-md-5 col-sm-2">
+                <ul class="nav navbar-nav navbar-right col-lg-2 col-md-5 col-sm-2">
+                    Time: <button type="button" id="timePlay" class="btn btn-default" disabled="disabled">00:00:00</button>
+                </ul>
+                <ul class="nav navbar-nav navbar-right col-lg-2 col-md-5 col-sm-2">
+                    Date: <button type="button" id="datePlay" class="btn btn-default" disabled="disabled">YYYY-MM-DD</button>
+                </ul>
+                <ul class="nav navbar-nav navbar-right col-lg-6 col-md-5 col-sm-2">
                     <div class="btn-group" role="group" aria-label="...">
-                        <button onclick="drop()" type="button" class="btn btn-default" id="login">Play
+                        <button onclick="drop()" type="button" class="btn btn-default" id="playButton" data-toggle="button"><span class="glyphicon glyphicon-play" aria-hidden="true"></span>Play
                         </button>
                     </div>
                 </ul>
@@ -74,7 +80,7 @@
     </div>
 </nav>
 
-<div id="map" style="height:88%"></div>
+<div id="map" style="height:95%"></div>
 
 <div class="navbar navbar-default navbar-fixed-bottom">
     <div class="container-fluid">
@@ -269,6 +275,7 @@
     }
 
     function drop() {
+        $('#playButton').prop('disabled', true);
         clearMarkers();
 
         var Colors = [
@@ -286,12 +293,19 @@
         <c:forEach var="entry" items="${viewCoordinates}">
         var position = {lat:${entry.latitude}, lng:${entry.longitude}}
         var ratingColor = Colors[${entry.rating} + 1];
-        addMarkerWithTimeout(position, i * 100, ratingColor);
+
+        var timeString = "${entry.timestamp}".substring(0,10);
+        <%--console.log("Time: " + "${entry.timestamp}");--%>
+        var dateString = "${entry.timestamp}".substring(11,22);
+
+        addMarkerWithTimeout(position, i * 100, ratingColor, timeString, dateString);
         i++;
         </c:forEach>
     }
 
-    function addMarkerWithTimeout(position, timeout, color) {
+    function addMarkerWithTimeout(position, timeout, color, timeString, dateString) {
+//        $("#time.btn.btn-default").text(timestamp);
+//        $("#date.btn.btn-default").text(timestamp);
         window.setTimeout(function() {
             markers.push(new google.maps.Marker({
                 position: position,
@@ -304,6 +318,8 @@
                     scale: 3.0
                 }
             }));
+            $("#timePlay.btn.btn-default").text(timeString);
+            $("#datePlay.btn.btn-default").text(dateString);
         }, timeout);
     }
 

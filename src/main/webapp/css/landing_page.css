@@ -4,8 +4,14 @@ html,body{
     font-family:  Montserrat, Trebuchet, sans-serif; height: 100%; margin: 0; padding: 0;
 }
 
+/*.navbar{*/
+    /*!*background-color: #EFAA1F;*!*/
+    /*background-color: #EDA649;*/
+/*}*/
+
 .navbar.navbar-default{
     font-family:  Montserrat, Trebuchet, sans-serif;
+    background-color: #F9DA68 !important;
 }
 
 /*GOOGLE MAP*/
@@ -19,10 +25,6 @@ html,body{
     display: none;
 }
 
-.navbar{
-    background-color: #EFAA1F;
-}
-
 .navbar-brand{
     margin-top: -10px;
 }
@@ -33,7 +35,7 @@ html,body{
 }
 
 .navbar-right, #gps{
-    margin-top: 5px;
+    margin-top: 7px;
 }
 
 /*for jqRangeSlider*/
@@ -47,12 +49,12 @@ html,body{
 }
 
 #gps{
-    margin-bottom: -25px;
+    margin-bottom: -22px;
 }
 
-#login, #logout #drop{
-    margin-bottom: -15px;
-}
+/*#login, #logout, #drop{*/
+    /*margin-bottom: 10px;*/
+/*}*/
 
 .modal{
     margin-top: 40px;
