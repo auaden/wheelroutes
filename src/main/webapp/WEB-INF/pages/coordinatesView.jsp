@@ -294,9 +294,9 @@
         var position = {lat:${entry.latitude}, lng:${entry.longitude}}
         var ratingColor = Colors[${entry.rating} + 1];
 
-        var timeString = "${entry.timestamp}".substring(0,10);
+        var dateString = "${entry.timestamp}".substring(0,10);
         <%--console.log("Time: " + "${entry.timestamp}");--%>
-        var dateString = "${entry.timestamp}".substring(11,22);
+        var timeString = "${entry.timestamp}".substring(11,22);
 
         addMarkerWithTimeout(position, i * 100, ratingColor, timeString, dateString);
         i++;
@@ -318,6 +318,8 @@
                     scale: 3.0
                 }
             }));
+            map.setCenter(position);
+            map.setZoom(18);
             $("#timePlay.btn.btn-default").text(timeString);
             $("#datePlay.btn.btn-default").text(dateString);
         }, timeout);
