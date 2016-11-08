@@ -68,6 +68,7 @@ public class FrontController {
     public ModelAndView login(@ModelAttribute("user") User user) {
         ModelAndView mv = new ModelAndView();
         String errorMsg = userService.login(user);
+
         if (errorMsg != null) {
             mv.setViewName("landing");
             //HashMap<Integer, HashMap<Integer, ArrayList<Coordinate>>>  viewCoordinates = coordinateService.retrieveViewCoordinates(true);
@@ -79,6 +80,7 @@ public class FrontController {
             } else {
                 mv.setViewName("redirect:landing.do");
             }
+            user = userService.findUser(user.getEmail());
             mv.addObject("authUser", user);
         }
         return mv;
@@ -242,5 +244,19 @@ public class FrontController {
         dateMap.put("endHour", endHour);
         dateMap.put("endMinute", endMinute);
         return dateMap;
+    }
+
+
+    @RequestMapping(value = "/process-feedback", method = RequestMethod.POST)
+    public ModelAndView processFeedback(@ModelAttribute("authUser") User user,
+                                        @RequestParam("optradio") String feedback) {
+        System.out.println("feedback value = " + feedback);
+        int feedbackInt = 0;
+        if (feedback.equals("more")) {
+            feedbackInt = 1;
+        }
+
+        userService.modifySensitivity(user, feedbackInt);
+        return new ModelAndView("redirect:landing.do");
     }
 }

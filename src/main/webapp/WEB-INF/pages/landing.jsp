@@ -69,7 +69,7 @@
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     <h4 class="modal-title" id="exampleModalLabel"><center>Rating Feedback</center></h4>
                 </div>
-                <form>
+                <form action="/process-feedback.do" method="POST">
                     <div class="modal-body">
                         <div class="progress">
                             <div class="progress-bar progress-bar-warning progress-bar-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
@@ -81,7 +81,7 @@
                                     User user = (User) request.getAttribute("authUser");
                             %>
                             <center><h5>Welcome Back! <b><%=user.getEmail()%></b></h5></br>
-                            <%}%>
+                                <%}%>
                                 <div class="well">
                                     Please fill up the following questions to help us gauge the accuracy of the coloured routes.
                                 </div>
@@ -100,8 +100,8 @@
                             <center>
                                 <div class="well">I find it ____ painful following the colour coded routes.</div>
                                 <div class="radio">
-                                    <label class="radio-inline"><input type="radio" name="optradio">More</label>
-                                    <label class="radio-inline"><input type="radio" name="optradio">Less</label>
+                                    <label class="radio-inline"><input type="radio" name="optradio" value="more">More</label>
+                                    <label class="radio-inline"><input type="radio" name="optradio" value="less">Less</label>
                                 </div>
                             </center>
                         </div>

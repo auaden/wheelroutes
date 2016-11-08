@@ -10,7 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Array;
+import java.math.RoundingMode;
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
 import java.util.*;
 
 /**
@@ -75,7 +77,7 @@ public class CoordinateService {
 
     //new algorithms
 
-    //COORDINATES VIEW-----------------------------------------------------------------------------------------
+    //ROUTES VIEW-----------------------------------------------------------------------------------------
     public HashMap<String, Route> startProcessingForRoutes (int userId,
                                                                               String startDate,
                                                                               String endDate,
@@ -101,6 +103,45 @@ public class CoordinateService {
 
         map = removeLessDenseClustersForRoutes(map, 50);
         map = smoothRoutes(map);
+
+
+        TreeMap<Integer, ArrayList<Coordinate>> newMap = new TreeMap<>();
+
+        TreeMap<String, Integer> testMap = new TreeMap<>();
+
+        for (Map.Entry<Integer, ArrayList<Coordinate>> entry : map.entrySet()) {
+            ArrayList<Coordinate> coords = entry.getValue();
+            for (Coordinate coord : coords) {
+                double lat = coord.getLatitude();
+                double lng = coord.getLongitude();
+                DecimalFormat df = new DecimalFormat("#.####");
+                df.setRoundingMode(RoundingMode.HALF_EVEN);
+                double newLat = Double.parseDouble(df.format(lat));
+                double newLng = Double.parseDouble(df.format(lng));
+
+                coord.setLatitude(newLat);
+                coord.setLongitude(newLng);
+
+                String compositeKey = df.format(lat) + "," + df.format(lng);
+                Integer coordCountInGrid = testMap.get(compositeKey);
+                if (coordCountInGrid == null) {
+                    testMap.put(compositeKey, 1);
+                } else {
+                    coordCountInGrid++;
+                    testMap.put(compositeKey, coordCountInGrid);
+                }
+            }
+            //  GpsUtility.applyKalmanFiltering(coords, 1, 15);
+
+        }
+
+        for (Map.Entry<String, Integer> entry : testMap.entrySet()) {
+            String key = entry.getKey();
+            String[] coord = key.split(",");
+            double lat = Double.parseDouble(coord[0]);
+            double lng = Double.parseDouble(coord[1]);
+
+        }
 
         HashMap<String, Route> displayMap = sortIntoRoutesWithRating(map);
 

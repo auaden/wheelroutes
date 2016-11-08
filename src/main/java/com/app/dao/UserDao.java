@@ -62,7 +62,7 @@ public class UserDao {
 
     public User find(String email) {
         //normal method
-        String sql = "select email, password from \"user\" where email = ?";
+        String sql = "select * from \"user\" where email = ?";
         //String sql = "select email, password, sensitivity from \"user\" where email = ?";
         try {
             User toReturn = jdbcTemplate.queryForObject(
@@ -75,7 +75,9 @@ public class UserDao {
                             User user = new User();
                             user.setEmail(resultSet.getString("email"));
                             user.setPassword(resultSet.getString("password"));
-                            //user.setSensitivity(resultSet.getInt("sensitivity"));
+                            user.setSensitivity(resultSet.getInt("sensitivity"));
+                            user.setHaveBalance(resultSet.getBoolean("havebalance"));
+                            user.setExpPain(resultSet.getBoolean("exppain"));
                             return user;
                         }
                     }, email);
@@ -91,9 +93,16 @@ public class UserDao {
     }
     
     public void modifySensitivity(User user, int difference){
+        System.out.println("user email: " + user.getEmail());
+        System.out.println("user sensi: " + user.getSensitivity());
+
+
+
+        int newSensitivity = user.getSensitivity() + difference;
+
         int count = jdbcTemplate.update(
-                "update \"user\" set(email, sensitivity) = (?,?) where email=?",
-                user.getEmail(), user.getSensitivity() + difference);
+                "update \"user\" set(sensitivity) = (?) where email=?",
+                newSensitivity, user.getEmail());
         if (count != 1) throw new UpdateFailedException("Update sensitivity failed");
     }
 

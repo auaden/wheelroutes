@@ -135,6 +135,9 @@ public class AxisService {
 
     //calculate bumpiness
     //try 2 logic
+
+    private static final double UP_BUMP_VALUE = 3.000; //compares each 0.1s
+    private final double SLOPE_VARIANCE = 0.050;
     public int getBumpinessRating(ArrayList<Axis> sortedAxes, int userSensitivity){
         double totalDiff = 0;
         for(Axis axis:sortedAxes){
@@ -159,6 +162,118 @@ public class AxisService {
         } else {
             return 6;
         }
+
+//
+//        double initialX = 0.0;
+//        double initialY = 0.0;
+//        double initialZ = 0.0;
+//
+//        double nextX = 0.0;
+//        double nextY = 0.0;
+//        double nextZ = 0.0;
+//
+//        if(sortedAxes != null && sortedAxes.size() > 0){
+//            Axis initialAxis = sortedAxes.get(0);
+//            initialX = initialAxis.getxAxis();
+//            initialY = initialAxis.getyAxis();
+//            initialZ = initialAxis.getzAxis();
+//
+//            Axis nextAxis = sortedAxes.get(1);
+//            nextX = nextAxis.getxAxis();
+//            nextY = nextAxis.getyAxis();
+//            nextZ = nextAxis.getzAxis();
+//        }
+//
+//        double totalChange = 0.0;
+//        double slopeAverage = 0.0;
+//        double slopeVariance = 0.0;
+//        double changeOfVariance = 0.0;
+//        boolean noChangeForVariance = false;
+//
+//
+//        for(int x = 2; x < sortedAxes.size(); x++){
+//
+//            Axis axis = sortedAxes.get(x);
+//
+//            double xAxis = axis.getxAxis();
+//            double yAxis = axis.getyAxis();
+//            double zAxis = axis.getzAxis();
+//
+//            //change of 2 record jump
+//            double changeX = xAxis - initialX;
+//            double changeY = yAxis - initialY;
+//            double changeZ = zAxis - initialZ;
+//
+//            //change of 1 record jump
+//            double nextChangeX = xAxis - nextX;
+//            double nextChangeY = yAxis - nextY;
+//            double nextChangeZ = zAxis - nextZ;
+//
+//            double changeXYZ = Math.pow(changeX,2) + Math.pow(changeY,2) + Math.pow(changeZ,2);
+//            double nextChangeXYZ = Math.pow(nextChangeX,2) + Math.pow(nextChangeY,2) + Math.pow(nextChangeZ,2);
+//
+////            //if it's a hard bump show red instantly
+////            if(nextChangeXYZ > UP_BUMP_VALUE){
+////                return 6;
+////            }
+//
+//            initialX = nextX;
+//            initialY = nextY;
+//            initialZ = nextZ;
+//
+//            nextX = xAxis;
+//            nextY = yAxis;
+//            nextZ = zAxis;
+//
+//            slopeVariance += Math.abs(Math.sin(initialX) - Math.sin(nextX));
+//            slopeAverage += Math.abs(Math.sin(initialX));
+//            totalChange += nextChangeXYZ;
+//        }
+//
+//        int rating = 1;
+//
+//        if(totalChange < LVL1_BUMP){
+//            return 0;
+//        }else if(totalChange >= LVL1_BUMP && totalChange <LVL2_BUMP){
+//            return 1;
+//        }else if(totalChange >= LVL2_BUMP && totalChange < LVL3_BUMP){
+//            return 2;
+//        }else if(totalChange >= LVL3_BUMP && totalChange < LVL4_BUMP){
+//            return 3;
+//        }else if(totalChange >= LVL4_BUMP && totalChange < LVL5_BUMP){
+//            return 4;
+//        }else if(totalChange >= LVL5_BUMP && totalChange < LVL6_BUMP){
+//            return 5;
+//        }else if(totalChange >= LVL6_BUMP){
+//            return 6;
+//        }
+//
+//        slopeVariance = slopeVariance/sortedAxes.size();
+//        slopeAverage = slopeAverage/sortedAxes.size();
+//
+//        if(slopeVariance > SLOPE_VARIANCE){
+//            //if the slopeAverage is affected by the bumpy path, the slopeAverage is not useful for measuring slope
+//            rating = rating;
+//        } else if(slopeAverage < LVL1_SLOPE){
+//            return 0;
+//        }else if (slopeAverage >= LVL1_SLOPE && slopeAverage < LVL2_SLOPE){
+//            return 1;
+//        }else if (slopeAverage >= LVL2_SLOPE && slopeAverage < LVL3_SLOPE){
+//            return 2;
+//        }else if (slopeAverage >= LVL3_SLOPE && slopeAverage < LVL4_SLOPE){
+//            return 3;
+//        }else if (slopeAverage >= LVL4_SLOPE && slopeAverage < LVL5_SLOPE){
+//            return 4;
+//        }else if(slopeAverage >= LVL5_SLOPE){
+//            return 5;
+//        }else if(slopeAverage >= LVL6_SLOPE){
+//            return 6;
+//        }
+//
+//
+//        return 1;
+
+
     }
 
     //based on calculated tilt and bumpiness, come up with a calculation for coloring

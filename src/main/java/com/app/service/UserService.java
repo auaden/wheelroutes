@@ -31,6 +31,11 @@ public class UserService {
 
         return errorMsg;
     }
+
+
+    public User findUser(String email) {
+        return userDao.find(email);
+    }
     /*
     public String register(User user) {
         String errorMsg = null;
@@ -84,10 +89,11 @@ public class UserService {
     
     //difference 
     public void modifySensitivity(User user, int sensitivityAdjust) {
+        User fullUser = userDao.find(user.getEmail());
         if (sensitivityAdjust > 0) {
-            userDao.modifySensitivity(user, 5); //increase
+            userDao.modifySensitivity(fullUser, 5); //increase
         } else {
-            userDao.modifySensitivity(user, -5); //decrease
+            userDao.modifySensitivity(fullUser, -5); //decrease
         }
     }
     
