@@ -11,7 +11,11 @@ html,body{
 
 .navbar.navbar-default{
     font-family:  Montserrat, Trebuchet, sans-serif;
-    background-color: #EFAA1F !important;
+    background-color: #F9DA68 !important;
+}
+
+.jumbotron{
+    margin-bottom: 0px;
 }
 
 /*GOOGLE MAP*/
@@ -89,4 +93,8 @@ html,body{
     margin-top: 25px;
 }
 
+/*in admin page*/
+#back.btn.btn-default{
+    margin-top:3px;
+}
 

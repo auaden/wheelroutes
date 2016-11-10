@@ -399,7 +399,7 @@
                         "<center><h4>Add Obstacle</h4></center>" +
                         '<form id="upload-form" method="POST" enctype="multipart/form-data" action="/process-upload-obstacle.do">' +
                         '<div class="form-group">' +
-                        '<input type="hidden" name="email" value="awloong@gmail.com">' +
+                        '<input type="hidden" name="email" value="'+ "${authUser.email}" + '">' +
                         '<input type="hidden" name="lat" value="' + location.lat() +'">' +
                         '<input type="hidden" name="lng" value="' + location.lng() + '">' +
                         '<label for="inputDescription">Description</label>' +
@@ -454,7 +454,8 @@
                         '<p><b>Description:</b></p>' +
                         '<p>' + desc + '</p>' +
                         '<b>Timestamp: </b>' + ts +
-                        '<p><center><img src="http://wheelroutes.icitylab.com/rest/obstacle/'+ lat + '/' + lng + '/"  style="width:200px; height:200px"/></center><p>' +
+//                        '<p><center><img src="http://wheelroutes.icitylab.com/rest/obstacle/'+ lat + '/' + lng + '/"  style="width:200px; height:200px"/></center><p>' +
+                        '<p><center><img src="http://localhost:8080/rest/obstacle/'+ lat + '/' + lng + '/"  style="width:200px; height:200px"/></center><p>' +
                         '</div></div>';
 
                 var infowindow = new google.maps.InfoWindow({
