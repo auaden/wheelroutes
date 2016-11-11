@@ -63,13 +63,16 @@
                 <a class="navbar-brand" href="#"><i class="fa fa-wheelchair fa-2x" aria-hidden="true"></i>WheelRoutes</a>
             </div>
             <div id="collapse navbar-collapse" class="collapse navbar-collapse">
+                <ul class="nav navbar-nav navbar-right col-lg-1 col-md-5 col-sm-2">
+                    <a href="/admin.do"><button class="btn btn-default" type="button" id="back">Back</button></a>
+                </ul>
                 <ul class="nav navbar-nav navbar-right col-lg-2 col-md-5 col-sm-2">
                     Time: <button type="button" id="timePlay" class="btn btn-default" disabled="disabled">00:00:00</button>
                 </ul>
                 <ul class="nav navbar-nav navbar-right col-lg-2 col-md-5 col-sm-2">
                     Date: <button type="button" id="datePlay" class="btn btn-default" disabled="disabled">YYYY-MM-DD</button>
                 </ul>
-                <ul class="nav navbar-nav navbar-right col-lg-6 col-md-5 col-sm-2">
+                <ul class="nav navbar-nav navbar-right col-lg-5 col-md-5 col-sm-2">
                     <div class="btn-group" role="group" aria-label="...">
                         <button onclick="drop()" type="button" class="btn btn-default" id="playButton" data-toggle="button"><span class="glyphicon glyphicon-play" aria-hidden="true"></span>Play
                         </button>

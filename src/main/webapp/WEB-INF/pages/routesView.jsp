@@ -62,7 +62,11 @@
                 </button>
                 <a class="navbar-brand" href="#"><i class="fa fa-wheelchair fa-2x" aria-hidden="true"></i>WheelRoutes</a>
             </div>
-            <%--<div id="collapse navbar-collapse" class="collapse navbar-collapse">--%>
+            <div id="collapse navbar-collapse" class="collapse navbar-collapse">
+                <ul class="nav navbar-nav navbar-right col-lg-2 col-md-5 col-sm-2">
+                    <a href="/admin.do"><button class="btn btn-default" type="button" id="back">Back</button></a>
+                </ul>
+            </div>
                 <%--<ul class="nav navbar-nav navbar-right col-lg-3 col-md-5 col-sm-2">--%>
                     <%--<div class="btn-group" role="group" aria-label="...">--%>
                         <%--<button onclick="drop()" type="button" class="btn btn-default" id="login">Display--%>

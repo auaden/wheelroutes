@@ -65,10 +65,12 @@
 
     <div class="jumbotron">
         <h1>Admin Page</h1>
-        <p class="lead">[Process | View | Approve]</p>
-        <a class="btn btn-lg btn-warning" href="/process-data.do" role="button">Process Data</a>
-        <a class="btn btn-lg btn-warning" href="/routesView.do" role="button">View by Routes</a>
-        <a class="btn btn-lg btn-warning" href="/coordinatesView.do" role="button">View by Coordinates</a>
+        <p class="lead">Process | View | Approve</p>
+        <%--<a class="btn btn-lg btn-warning" href="/process-data.do" role="button">Process Data</a>--%>
+        <a class="btn btn-default" href="/process-data.do" role="button" style="background-color:#3D5B6E; color:white">Process Data</a>
+        <a class="btn btn-default" href="/data-analytics.do" role="button" style="background-color:#3D5B6E; color: white">Data Analytics</a>
+        <a class="btn btn-default" href="/routesView.do" role="button" style="background-color:#177E89; color:white">View by Routes</a>
+        <a class="btn btn-default" href="/coordinatesView.do" role="button" style="background-color:#177E89; color:white">View by Coordinates</a>
     </div>
 
     <div class="container-fluid">
@@ -97,13 +99,21 @@
                                 <td>${entry.description}</td>
                                 <td>${entry.approved}</td>
                                 <td>
-                                    <form action="/process-approve-obstacle.do" method="post">
-                                        <input type="hidden" name="email" value="${entry.email}">
-                                        <input type="hidden" name="lat" value="${entry.latitude}">
-                                        <input type="hidden" name="lng" value="${entry.longitude}">
-                                        <button type="submit" class="btn btn-success">Approve</button></center>
-                                        <%--<input type="submit" value="APPROVE" >--%>
-                                    </form>
+                                    <div class="container-fluid">
+                                        <div class="row">
+                                        <form action="/process-approve-obstacle.do" method="post">
+                                            <input type="hidden" name="email" value="${entry.email}">
+                                            <input type="hidden" name="lat" value="${entry.latitude}">
+                                            <input type="hidden" name="lng" value="${entry.longitude}">
+                                            <button type="submit" class="btn btn-success btn-block">Approve</button></center>
+                                            <%--<input type="submit" value="APPROVE" >--%>
+                                        </form>
+                                        </br>
+                                        <form action="" method="post">
+                                            <button type="submit" class="btn btn-danger btn-block">Delete</button></center>
+                                        </form>
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                         </c:forEach>
