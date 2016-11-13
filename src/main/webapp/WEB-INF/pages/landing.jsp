@@ -91,18 +91,20 @@
                             <center>
                                 <div class="well">Do you find the colour coded routes accurate to your needs? </div>
                                 <div class="radio">
-                                    <label class="radio-inline"><input type="radio" name="optradio">Yes</label>
-                                    <label class="radio-inline"><input type="radio" name="optradio">No</label>
+                                    <label class="radio-inline"><input type="radio" name="optradio" value="yes" id="yes">Yes</label>
+                                    <label class="radio-inline"><input type="radio" name="optradio" value="no" id="no">No</label>
                                 </div>
+                                <div id="accuracyMsg" style="display:none; color:red">Please indicate a value.</p>
                             </center>
                         </div>
                         <div class="step">
                             <center>
                                 <div class="well">I find it ____ painful following the colour coded routes.</div>
                                 <div class="radio">
-                                    <label class="radio-inline"><input type="radio" name="optradio" value="more">More</label>
-                                    <label class="radio-inline"><input type="radio" name="optradio" value="less">Less</label>
+                                    <label class="radio-inline"><input type="radio" name="optradio" value="more" id="more">More</label>
+                                    <label class="radio-inline"><input type="radio" name="optradio" value="less" id="less">Less</label>
                                 </div>
+                                <div id="painMsg" style="display:none;color:red">Please indicate a value.</p>
                             </center>
                         </div>
                         <div class="step well">
@@ -112,7 +114,7 @@
                     <div class="modal-footer">
                         <button class="action back btn btn-info">Back</button>
                         <button class="action next btn btn-info">Next</button>
-                        <button class="action submit btn btn-success">Submit</button>
+                        <button class="action submit btn btn-success">Close</button>
                     </div>
                 </form>
             </div>
@@ -231,15 +233,70 @@
             setProgress(current);
 
             // Next button click action
-            btnnext.click(function (e) {
-                if (current < widget.length) {
-                    widget.show();
-                    widget.not(':eq(' + (current++) + ')').hide();
-                    setProgress(current);
+            btnnext.click(function(e){
+                if(current < widget.length){
+                    // var x = document.getElementById("yes").value;
+                    if (current == 2){
+                        // var selection = document.querySelectorAll('input[name="accuracy"]');
+                        // var response = selection[0].value;
+                        var accuracyYes = document.getElementById('yes').checked;
+                        var accuracyNo = document.getElementById('no').checked;
+                        console.log("Yes Test: " + accuracyYes);
+                        console.log("No Test: " + accuracyNo);
+                        //user never press any button
+                        if(!accuracyYes && !accuracyNo){
+                            document.getElementById('accuracyMsg').style.display = "block";
+                        }
+
+                        //user feel that color rating is NOT accurate
+                        if (!accuracyYes && accuracyNo){
+                            widget.show();
+                            widget.not(':eq('+(current++)+')').hide();
+                            setProgress(current);
+                            //user feel that color rating is accurate
+                        } else if(accuracyYes && !accuracyNo){
+                            widget.next().show();
+                            widget.not(':eq('+(widget.length - 1)+')').hide();
+                            current = parseInt(widget.length);
+                            setProgress(current);
+                        }
+                    } else if (current == 3){
+                        var painYes = document.getElementById('more').checked;
+                        var painNo = document.getElementById('less').checked;
+                        console.log("Pain Test: " + painYes);
+                        console.log("Not Pain Test: " + painNo);
+
+                        if(!painYes && !painNo){
+                            document.getElementById('painMsg').style.display = "block";
+                        }
+
+                        if(!painYes && painNo || painYes && !painNo){
+                            widget.next().show();
+                            widget.not(':eq('+(widget.length - 1)+')').hide();
+                            current = parseInt(widget.length);
+                            setProgress(current);
+                        }
+
+                    }else{
+                        widget.show();
+                        widget.not(':eq('+(current++)+')').hide();
+                        setProgress(current);
+                    }
                 }
                 hideButtons(current);
                 e.preventDefault();
             })
+
+            // Next button click action
+//            btnnext.click(function (e) {
+//                if (current < widget.length) {
+//                    widget.show();
+//                    widget.not(':eq(' + (current++) + ')').hide();
+//                    setProgress(current);
+//                }
+//                hideButtons(current);
+//                e.preventDefault();
+//            })
 
             // Back button click action
             btnback.click(function (e) {
@@ -271,7 +328,7 @@
 
             if(current < limit) btnnext.show();
             if(current > 1) btnback.show();
-            if (current == limit) { btnnext.hide(); btnsubmit.show(); }
+            if (current == limit) { btnnext.hide(); btnsubmit.show(); btnback.hide()}
         }
 
         //to redirect logged in user to register page

@@ -290,11 +290,13 @@ public class FrontController {
     public ModelAndView processFeedback(@ModelAttribute("authUser") User user,
                                         @RequestParam("optradio") String feedback) {
         System.out.println("feedback value = " + feedback);
+        if (feedback.equals("yes")){
+            return new ModelAndView("redirect:landing.do");
+        }
         int feedbackInt = 0;
         if (feedback.equals("more")) {
             feedbackInt = 1;
         }
-
         userService.modifySensitivity(user, feedbackInt);
         return new ModelAndView("redirect:landing.do");
     }
