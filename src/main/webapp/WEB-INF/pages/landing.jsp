@@ -52,9 +52,14 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="Redirect()">Not Registered?</button>
-                        <!--<a href="/register.do"><button class="btn center">Not registered?</button></a>-->
-                        <input type="submit" class="btn btn-warning" value="Sign in" style="color:default"/>
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-lg-6 col-lg-offset-3">
+                        <%--<button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="Redirect()">Not Registered?</button>--%>
+                                    <input type="submit" class="btn btn-block" value="Login" style="background-color:#565656; color: white"/>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </form:form>
             </div>
@@ -139,7 +144,7 @@
                 <div id="collapse navbar-collapse" class="collapse navbar-collapse">
                     <!--Replace login button to logout button for successfully logged in user-->
                     <!-- for search bar of locations -->
-                    <ul class="nav navbar-nav col-lg-7 col-md-5 col-sm-8">
+                    <ul class="nav navbar-nav col-lg-8 col-md-5 col-sm-8">
                     <%--to display logged in username--%>
                     <%
                         if (request.getAttribute("authUser") != null) {
@@ -149,32 +154,33 @@
                     <%}%>
                         <div class="navbar-form navbar-left" role="search">
                             <div class="form-group">
-                                <input type="text" class="form-control" id="addressSearch" placeholder="Search">
+                                <input type="text" class="form-control" id="addressSearch" placeholder="Search location...">
                             </div>
                             <button type="submit" id="submitSearch" class="btn btn-default">Submit</button>
                         </div>
-
-                        <button type="button" class="btn btn-default" id="gps" onclick="initMap.getLocation()">
-                            <span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span>
-                        </button>
+                        <%--<button type="button" class="btn btn-default" id="gps" onclick="initMap.getLocation()">--%>
+                            <%--<span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span>--%>
+                        <%--</button>--%>
                     </ul>
 
-                    <ul class="nav navbar-nav navbar-right col-lg-3 col-md-5 col-sm-2">
+                    <ul class="nav navbar-nav navbar-right col-lg-2 col-md-5 col-sm-2">
                         <div class="btn-group" role="group" aria-label="...">
                             <%
                                 if (request.getAttribute("authUser") == null) {
                             %>
-                                <button type="button" class="btn btn-default" data-toggle="modal" data-target="#exampleModal" id="login">Login
+                                <button type="button" class="btn btn-default" data-toggle="modal" data-target="#exampleModal" id="login"
+                                        style="background-color:#565656; color: white">Login
                                 </button>
+                                <button type="button" class="btn btn-warning" onclick="Redirect()">Register</button>
                                 <%--for logged in user: logout function--%>
                             <%
                                 }else{
                             %>
-                                <a href="/process-logout.do"><button class="btn btn-default" type="button" id="logout">Logout</button></a>
+                                <a href="/process-logout.do"><button class="btn btn-warning" type="button" id="logout">Logout</button></a>
                             <%}%>
-                            <button class="btn btn-warning" type="button" id="drop" onclick="initMap.drop()" style="color:default">
-                                Obstacle Reported
-                            </button>
+                            <%--<button class="btn btn-warning" type="button" id="drop" onclick="initMap.drop()" style="color:default">--%>
+                                <%--Obstacle Reported--%>
+                            <%--</button>--%>
                         </div>
                     </ul>
             </div> <!--End of row -->
@@ -287,17 +293,6 @@
                 e.preventDefault();
             })
 
-            // Next button click action
-//            btnnext.click(function (e) {
-//                if (current < widget.length) {
-//                    widget.show();
-//                    widget.not(':eq(' + (current++) + ')').hide();
-//                    setProgress(current);
-//                }
-//                hideButtons(current);
-//                e.preventDefault();
-//            })
-
             // Back button click action
             btnback.click(function (e) {
                 if (current > 1) {
@@ -342,47 +337,22 @@
 
         function initMap() {
 
-            //TO GET CURRENT LOCATION OF THE USER
-//            if(initialLanding){
-//                getLocation();
-//            }
-//
-//            function getLocation() {
+            //for navbar current location subsequent recall
+//            initMap.getLocation = function getLocation() {
+//                initialLanding = false;
 //                if (navigator.geolocation) {
 //                    navigator.geolocation.getCurrentPosition(showPosition, showError);
 //                } else {
 //                    alert("Geolocation is not supported by this browser.");
 //                }
 //            }
-
-            //for navbar current location subsequent recall
-            initMap.getLocation = function getLocation() {
-                initialLanding = false;
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(showPosition, showError);
-                } else {
-                    alert("Geolocation is not supported by this browser.");
-                }
-            }
-
-            function showPosition(position) {
-                defaultLat = position.coords.latitude;
-                defaultLng = position.coords.longitude;
-                defaultZoomLevel = 16;
-                initMap();
-                //for subsequrnt current location recall
-//                if (!initialLanding){
-//                    map = new google.maps.Map(document.getElementById('map'), {
-//                        center: {lat: defaultLat, lng: defaultLng},
-//                        scrollwheel: true,
-//                        zoom: 18,
-//                    });
-//                } else{
-//                    //for inital landing page
-//                    initialLanding = false;
-//                    initMap();
-//                }
-            }
+//
+//            function showPosition(position) {
+//                defaultLat = position.coords.latitude;
+//                defaultLng = position.coords.longitude;
+//                defaultZoomLevel = 16;
+//                initMap();
+//            }
 
 
             map = new google.maps.Map(document.getElementById('map'), {
@@ -549,31 +519,6 @@
                     color += letters[Math.floor(Math.random() * 16)];
                 }
                 return color;
-            }
-
-            initMap.drop = function drop() {
-                clearMarkers();
-                for (var i = 0; i < obstacles.length; i++) {
-                    addMarkerWithTimeout(obstacles[i], i * 200);
-                }
-            }
-
-            function addMarkerWithTimeout(position, timeout) {
-                window.setTimeout(function() {
-                    markers.push(new google.maps.Marker({
-                        position: position,
-                        map: map,
-                        animation: google.maps.Animation.DROP,
-                        icon: image
-                    }));
-                }, timeout);
-            }
-
-            function clearMarkers() {
-                for (var i = 0; i < markers.length; i++) {
-                    markers[i].setMap(null);
-                }
-                markers = [];
             }
 
             // ERORR FOR RETRIEVING USER'S GEOLOCATION

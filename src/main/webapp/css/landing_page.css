@@ -18,6 +18,10 @@ html,body{
     margin-bottom: 0px;
 }
 
+#addressSearch{
+    width: 450px;
+}
+
 /*GOOGLE MAP*/
 #map{
     position: relative;
