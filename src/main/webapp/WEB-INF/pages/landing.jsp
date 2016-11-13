@@ -356,7 +356,6 @@
             ];
             <c:forEach var="entry1" items="${viewRoutes}">
             <c:forEach var="route" items="${entry1.value}">
-            var rating = ${route.rating} + 1
             var routeCoordinates = [
                 <c:forEach var="mapEntry" items="${route.route}">
                 //coordinate
@@ -366,9 +365,9 @@
 
             var route = new google.maps.Polyline({
                 path: routeCoordinates,
-                strokeOpacity: 1,
-                strokeColor: Colors[rating],
-                strokeWeight: 5
+                strokeOpacity: 0.6,
+                strokeColor: Colors[${route.rating} + 1],
+                strokeWeight: 12
             });
             route.setMap(map);
             </c:forEach>

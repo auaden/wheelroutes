@@ -60,4 +60,8 @@ public class ObstacleService {
         obstacleDao.insert(prevObs);
     }
 
+    public void deleteObstacle(String email, double lat, double lng) {
+        obstacleDao.delete(email, lat, lng);
+    }
+
 }

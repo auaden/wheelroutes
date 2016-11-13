@@ -109,7 +109,10 @@
                                             <%--<input type="submit" value="APPROVE" >--%>
                                         </form>
                                         </br>
-                                        <form action="" method="post">
+                                        <form action="/process-delete-obstacle.do" method="post">
+                                            <input type="hidden" name="email" value="${entry.email}">
+                                            <input type="hidden" name="lat" value="${entry.latitude}">
+                                            <input type="hidden" name="lng" value="${entry.longitude}">
                                             <button type="submit" class="btn btn-danger btn-block">Delete</button></center>
                                         </form>
                                         </div>

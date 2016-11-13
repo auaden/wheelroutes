@@ -30,12 +30,25 @@ public class CoordinateService {
     @Autowired
     public String coordProcessedTableName;
 
-    public HashMap<Integer, ArrayList<Route>> retrieveViewCoordinates() {
+    public HashMap<Integer, ArrayList<Route>> retrieveViewCoordinates(boolean isGrid) {
         ArrayList<Coordinate> coordinates = (ArrayList<Coordinate>) coordinateDao.findAll(coordProcessedTableName, false);
 
         HashMap<Integer, ArrayList<Coordinate>> splitByUserId = new HashMap<>();
 
         for (Coordinate coordinate : coordinates) {
+            if (isGrid) {
+                double lat = coordinate.getLatitude();
+                double lng = coordinate.getLongitude();
+
+                double roundedLatMultiplied = Math.round(lat * ROUND_OFF_VALUE);
+                double roundedLat = roundedLatMultiplied / ROUND_OFF_VALUE;
+
+                double roundedLongMultiplied = Math.round(lng * ROUND_OFF_VALUE);
+                double roundedLong = roundedLongMultiplied / ROUND_OFF_VALUE;
+
+                coordinate.setLatitude(roundedLat);
+                coordinate.setLongitude(roundedLong);
+            }
             int userId = coordinate.getUserId();
 
             ArrayList<Coordinate> userCoords = splitByUserId.get(userId);
@@ -54,18 +67,13 @@ public class CoordinateService {
         ArrayList<Route> routes = new ArrayList<>();
         for (Map.Entry<Integer, ArrayList<Coordinate>> entry : splitByUserId.entrySet()) {
             int userId = entry.getKey();
-            System.out.println(" user id : " + userId);
             ArrayList<Coordinate> userCoords = entry.getValue();
-            System.out.println(" size: " + userCoords.size());
-
             TreeMap<Integer, ArrayList<Coordinate>> subMap = splitRoutes(userCoords, 20);
             HashMap<String, Route> displayMap = sortIntoRoutesWithRating(subMap);
             for (Map.Entry<String, Route> entry2 : displayMap.entrySet()) {
                 routes.add(entry2.getValue());
             }
-            //map.putAll(subMap);
         }
-        System.out.println("routes size " + routes.size());
 
         int counter = 0;
         int routeId = 0;
@@ -90,6 +98,10 @@ public class CoordinateService {
 
         return map;
     }
+
+
+
+
 
     public HashMap<String, Route> retrieveViewCoordinates(int userId) {
         ArrayList<Coordinate> coordinates = (ArrayList<Coordinate>) coordinateDao.findById(userId, coordProcessedTableName, false);
@@ -147,8 +159,7 @@ public class CoordinateService {
         map = removeLessDenseClustersForRoutes(map, 50);
         map = smoothRoutes(map);
 
-        //map = routeFusion(map);
-
+        map = routeFusion(map);
 
         HashMap<String, Route> displayMap = sortIntoRoutesWithRating(map);
 
@@ -379,7 +390,6 @@ public class CoordinateService {
         return coordinates;
     }
 
-
     private static final int ROUND_OFF_VALUE = 10000;
     private TreeMap<Integer, ArrayList<Coordinate>> routeFusion (TreeMap<Integer, ArrayList<Coordinate>> map) {
 
@@ -401,15 +411,18 @@ public class CoordinateService {
 
                 String compositeKey = roundedLat + "," + roundedLong;
 
-                Integer coordCountInGrid = testMap.get(compositeKey);
-                if (coordCountInGrid == null) {
-                    testMap.put(compositeKey, 1);
-                    coord.setLatitude(roundedLat);
-                    coord.setLongitude(roundedLong);
-                } else {
-                    iter.remove();
-                }
+                coord.setLatitude(roundedLat);
+                coord.setLongitude(roundedLong);
+
+//                Integer coordCountInGrid = testMap.get(compositeKey);
+//                if (coordCountInGrid == null) {
+//                    testMap.put(compositeKey, 1);
+//
+//                } else {
+//                    iter.remove();
+//                }
             }
+
             //GpsUtility.applyKalmanFiltering(coords, 1, 10);
 
         }

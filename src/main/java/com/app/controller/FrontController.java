@@ -1,5 +1,6 @@
 package com.app.controller;
 
+import com.app.Utility.StopWatch;
 import com.app.domain.*;
 import com.app.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,7 @@ import java.net.URL;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by adenau on 10/9/16.
@@ -43,7 +45,17 @@ public class FrontController {
     public ModelAndView toLanding() {
         ModelAndView mv = new ModelAndView("landing", "user", new User());
         ArrayList<Obstacle> obstacles = obstacleService.retrieveAllApproved();
-        HashMap<Integer, ArrayList<Route>> routes = coordinateService.retrieveViewCoordinates();
+        HashMap<Integer, ArrayList<Route>> routes = coordinateService.retrieveViewCoordinates(false);
+        mv.addObject("viewRoutes", routes);
+        mv.addObject("obstacles", obstacles);
+        return mv;
+    }
+
+    @RequestMapping(value = "/gridView", method = RequestMethod.GET)
+    public ModelAndView toGridView() {
+        ModelAndView mv = new ModelAndView("gridView", "user", new User());
+        ArrayList<Obstacle> obstacles = obstacleService.retrieveAllApproved();
+        HashMap<Integer, ArrayList<Route>> routes = coordinateService.retrieveViewCoordinates(true);
         mv.addObject("viewRoutes", routes);
         mv.addObject("obstacles", obstacles);
         return mv;
@@ -122,6 +134,8 @@ public class FrontController {
     public ModelAndView processData() {
         ModelAndView mv = new ModelAndView();
 
+        StopWatch watch = new StopWatch();
+        watch.start();
         TreeMap<Integer, TreeMap<String, Integer>> data = coordinateService.retrieveOverallCoordData();
         for (Map.Entry<Integer, TreeMap<String, Integer>> entry : data.entrySet()) {
             int userId = entry.getKey();
@@ -132,7 +146,8 @@ public class FrontController {
                 coordinateService.processData(userId, date + " 00:00", date + " 23:59",ratingMap);
             }
         }
-
+        watch.stop();
+        System.out.println("Total processing time: " + TimeUnit.MILLISECONDS.toMinutes(watch.getTime()) + " mins");
         mv.setViewName("redirect:landing.do");
         return mv;
     }
@@ -156,6 +171,14 @@ public class FrontController {
                                                @RequestParam("lat") String lat,
                                                @RequestParam("lng") String lng) {
         obstacleService.approveObstacle(email, Double.parseDouble(lat), Double.parseDouble(lng));
+        return new ModelAndView("redirect:admin.do");
+    }
+
+    @RequestMapping(value = "/process-delete-obstacle", method = RequestMethod.POST)
+    public ModelAndView processDeleteObstacle(@RequestParam("email") String email,
+                                               @RequestParam("lat") String lat,
+                                               @RequestParam("lng") String lng) {
+        obstacleService.deleteObstacle(email, Double.parseDouble(lat), Double.parseDouble(lng));
         return new ModelAndView("redirect:admin.do");
     }
 
