@@ -25,7 +25,7 @@
 <body>
 <!-- Fixed navbar -->
 <nav role="navigation" class="navbar navbar-default navbar-fixed-top">
-    <a href="/landing.do"><button type="button" id="back" class="btn btn-primary">Back</button></a>
+    <a href="/landing.do"><button type="button" id="back" class="btn btn-default">Back</button></a>
 </nav>
 </br></br></br>
 
