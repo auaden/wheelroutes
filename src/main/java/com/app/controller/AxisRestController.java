@@ -44,9 +44,25 @@ public class AxisRestController {
         axisDao.insertBatch(filteredAxes, axisRawTableName);
     }
 
-    @RequestMapping(value = "/axes", method=RequestMethod.GET)
-    public List<Axis> list() {
-        return axisDao.findAll(axisProcessedTableName);
+    @RequestMapping(value = "/axes/{tableName}", method=RequestMethod.GET)
+    public List<AxisRest> list(@PathVariable String tableName) {
+        ArrayList<Axis> axes = (ArrayList<Axis>) axisDao.findAll(tableName);
+        ArrayList<AxisRest> axisRests = new ArrayList<>();
+
+        for (Axis axis : axes) {
+            if (axis != null) {
+                AxisRest axisRest =
+                        new AxisRest(axis.getUserId(),
+                                axis.getTimestamp().toString(),
+                                axis.getxAxis(),
+                                axis.getyAxis(),
+                                axis.getzAxis());
+
+                axisRests.add(axisRest);
+            }
+        }
+
+        return axisRests;
     }
 
     @RequestMapping(value = "/{tableName}", method=RequestMethod.GET)

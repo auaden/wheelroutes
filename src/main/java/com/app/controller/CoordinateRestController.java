@@ -5,6 +5,12 @@ import com.app.dao.CoordinateDao;
 import com.app.domain.Coordinate;
 import com.app.domain.CoordinateRest;
 import com.app.service.CoordinateService;
+import com.google.gson.*;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +18,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.xml.ws.RequestWrapper;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,9 +72,125 @@ public class CoordinateRestController {
         coordinateDao.insertRawBatch(filteredCoordinates, coordRawTableName);
     }
 
-    @RequestMapping(value = "/coordinates", method=RequestMethod.GET)
-    public List<Coordinate> list() {
-        return coordinateDao.findAll(coordProcessedTableName, false);
+    @RequestMapping(value = "/coordinates/{tableName}", method=RequestMethod.GET)
+    public List<CoordinateRest> list(@PathVariable String tableName) {
+        ArrayList<Coordinate> coordinates = (ArrayList<Coordinate>) coordinateDao.findAll(tableName, true);
+        System.out.println("Coordinates size retrieved : " + coordinates.size());
+        ArrayList<CoordinateRest> coordinateRests = new ArrayList<>();
+
+        for (Coordinate coord : coordinates) {
+            if (coord != null) {
+                CoordinateRest coordinateRest =
+                        new CoordinateRest(coord.getUserId(),
+                                coord.getTimestamp().toString(),
+                                coord.getLatitude(),
+                                coord.getLongitude(),
+                                coord.getNumSat());
+                coordinateRests.add(coordinateRest);
+            }
+        }
+
+
+        return coordinateRests;
+    }
+
+    @RequestMapping(value = "/coordinates/{userId}/{tableName}", method=RequestMethod.GET)
+    public List<CoordinateRest> list(@PathVariable(value="userId") int userId,
+                                     @PathVariable(value="tableName") String tableName) {
+        ArrayList<Coordinate> coordinates = (ArrayList<Coordinate>) coordinateDao.findById(userId, tableName, true);
+
+        System.out.println("Coordinates size retrieved : " + coordinates.size());
+        ArrayList<CoordinateRest> coordinateRests = new ArrayList<>();
+
+        int counter = 0;
+        JsonArray jArray = new JsonArray();
+
+        int batchCounter = 0;
+        for (Coordinate coord : coordinates) {
+            if (coord != null) {
+//                CoordinateRest coordinateRest =
+//                        new CoordinateRest(coord.getUserId(),
+//                                coord.getTimestamp().toString(),
+//                                coord.getLatitude(),
+//                                coord.getLongitude(),
+//                                coord.getNumSat());
+//                coordinateRests.add(coordinateRest);
+
+                JsonObject object = new JsonObject();
+                JsonPrimitive userIdElement = new JsonPrimitive(coord.getUserId());
+                JsonPrimitive timestampElement = new JsonPrimitive(coord.getTimestamp().toString());
+                JsonPrimitive latElement = new JsonPrimitive(coord.getLatitude());
+                JsonPrimitive lngElement = new JsonPrimitive(coord.getLongitude());
+                JsonPrimitive numSat = new JsonPrimitive(coord.getNumSat());
+                object.add("userId", new JsonPrimitive(68));
+                object.add("timestamp", timestampElement);
+                object.add("latitude", latElement);
+                object.add("longitude", lngElement);
+                object.add("numSat", numSat);
+                jArray.add(object);
+
+            } else {
+                counter++;
+            }
+
+            if (batchCounter == 1000) {
+                //System.out.println(jArray.toString());
+
+                String postUrl = "http://wheelroutes.icitylab.com/rest/coordinate/coordinates";// put in your url
+                Gson gson = new Gson();
+                HttpClient httpClient = HttpClientBuilder.create().build();
+                HttpPost post = new HttpPost(postUrl);
+
+                StringEntity postingString = null;//gson.tojson() converts your pojo to json
+                try {
+                    postingString = new StringEntity(gson.toJson(jArray));
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+                post.setEntity(postingString);
+                post.setHeader("Content-type", "application/json");
+                try {
+                    HttpResponse response = httpClient.execute(post);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                jArray = new JsonArray();
+                batchCounter = 0;
+            }
+
+            batchCounter++;
+        }
+
+//        System.out.println(jArray.toString());
+//        String postUrl = "www.wheelroutes.icitylab.com/coordinate/coordinates";// put in your url
+//        Gson gson = new Gson();
+//
+//        JsonObject object = new JsonObject();
+//
+//        HttpClient httpClient = HttpClientBuilder.create().build();
+//        HttpPost post = new HttpPost(postUrl);
+//
+//        StringEntity postingString = null;//gson.tojson() converts your pojo to json
+//        try {
+//            postingString = new StringEntity(gson.toJson(coordinateRests.get(0)));
+//        } catch (UnsupportedEncodingException e) {
+//            e.printStackTrace();
+//        }
+//
+//        System.out.println(postingString.toString());
+//
+//        post.setEntity(postingString);
+//        post.setHeader("Content-type", "application/json");
+//        try {
+//            HttpResponse response = httpClient.execute(post);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+
+        System.out.println("number of nulls : " + counter);
+        System.out.println("number going in : " + coordinateRests.size());
+        return null;
     }
 
     @RequestMapping(value = "/{tableName}", method=RequestMethod.GET)

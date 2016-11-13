@@ -13,8 +13,6 @@ public class CoordinateRest {
     private double latitude;
     private double longitude;
     private int numSat;
-    private int rating;
-
     public CoordinateRest(){}
 
     public CoordinateRest(int userId, String timestamp, double latitude, double longitude, int numSat) {
@@ -23,23 +21,6 @@ public class CoordinateRest {
         this.latitude = latitude;
         this.longitude = longitude;
         this.numSat = numSat;
-    }
-
-    public CoordinateRest(int userId, String timestamp, double latitude, double longitude, int numSat, int rating) {
-        this.userId = userId;
-        this.timestamp = timestamp;
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.numSat = numSat;
-        this.rating = rating;
-    }
-
-    public int getRating() {
-        return rating;
-    }
-
-    public void setRating(int rating) {
-        this.rating = rating;
     }
 
     public int getNumSat() {

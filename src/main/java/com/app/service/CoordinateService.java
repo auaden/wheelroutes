@@ -14,6 +14,7 @@ import java.math.RoundingMode;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by adenau on 5/8/16.
@@ -98,10 +99,6 @@ public class CoordinateService {
 
         return map;
     }
-
-
-
-
 
     public HashMap<String, Route> retrieveViewCoordinates(int userId) {
         ArrayList<Coordinate> coordinates = (ArrayList<Coordinate>) coordinateDao.findById(userId, coordProcessedTableName, false);
@@ -191,6 +188,9 @@ public class CoordinateService {
         coordinates = reduceStationaryPts(coordinates, 5.0);
         return coordinates;
     }
+
+
+    // UTILITY METHODS-----------------------------------------------------------------------------------------
 
     private HashMap<String, Route> sortIntoRoutesWithRating (TreeMap<Integer, ArrayList<Coordinate>> routes ) {
 
@@ -439,6 +439,50 @@ public class CoordinateService {
         return map;
     }
 
+    public void getTimeSpent(TreeMap<Integer, TreeMap<String, Integer>> data) {
+
+        TreeMap<Integer, TreeMap<String, String>> timeSpentMap = new TreeMap<>();
+
+        for (Map.Entry<Integer, TreeMap<String, Integer>> entry : data.entrySet()) {
+            int userId = entry.getKey();
+
+            TreeMap<String, String> innerMap = new TreeMap<>();
+
+            for (Map.Entry<String, Integer> entry2 : entry.getValue().entrySet()) {
+                String date = entry2.getKey();
+                ArrayList<Coordinate> coordinates = (ArrayList<Coordinate>)
+                        coordinateDao.findByDate(userId, date + " 00:00", date + " 23:59", coordRawTableName, true);
+                coordinates = GpsUtility.removeDuplicatesAndNoFix(coordinates);
+                coordinates = removeDuplicates(coordinates);
+                TreeMap<Integer, ArrayList<Coordinate>> routeMap = splitRoutes(coordinates, 20);
+
+                long dateDuration = 0;
+
+                for (Map.Entry<Integer, ArrayList<Coordinate>> entry3 : routeMap.entrySet()) {
+                    ArrayList<Coordinate> coords = entry3.getValue();
+                    if (!coords.isEmpty()) {
+                        long startTime = coords.get(0).getTimestamp().getTime();
+                        long endTime = coords.get(coords.size() - 1).getTimestamp().getTime();
+
+                        long duration = endTime - startTime;
+                        dateDuration += duration;
+                    }
+                }
+
+                String hms = String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(dateDuration),
+                        TimeUnit.MILLISECONDS.toMinutes(dateDuration) % TimeUnit.HOURS.toMinutes(1),
+                        TimeUnit.MILLISECONDS.toSeconds(dateDuration) % TimeUnit.MINUTES.toSeconds(1));
+
+                innerMap.put(date, "" + hms);
+
+            }
+            System.out.println("User id : " + userId);
+            System.out.println(innerMap);
+        }
+
+
+
+    }
 
 
 
