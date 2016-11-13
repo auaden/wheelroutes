@@ -32,7 +32,14 @@ public class CoordinateService {
 
     public HashMap<String, Route> retrieveViewCoordinates() {
         ArrayList<Coordinate> coordinates = (ArrayList<Coordinate>) coordinateDao.findAll(coordProcessedTableName, false);
-        TreeMap<Integer, ArrayList<Coordinate>> map = splitRoutes(coordinates, 20);
+
+        for (Coordinate coordinate : coordinates) {
+            int userId = coordinate.getUserId();
+
+        }
+
+
+        TreeMap<Integer, ArrayList<Coordinate>> map = splitRoutes(coordinates, 30);
         HashMap<String, Route> displayMap = sortIntoRoutesWithRating(map);
         return displayMap;
     }
@@ -50,23 +57,11 @@ public class CoordinateService {
         System.out.println("running algorithms for routes.. coord size: " + coordinates.size());
         HashMap<String, Route> result = runAlgorithmsForRoutes(coordinates, ratingMap);
         for (Map.Entry<String, Route> entry : result.entrySet()) {
-            System.out.println("key : " + entry.getKey() + " , " + entry.getValue());
+            //System.out.println("key : " + entry.getKey() + " , " + entry.getValue());
             Route route = entry.getValue();
             ArrayList<Coordinate> routeCoords = route.getRoute();
             coordinateDao.insertBatch(routeCoords, coordProcessedTableName);
         }
-    }
-
-    public void processRestData(ArrayList<Coordinate> coordinates) {
-
-//        coordinates = GpsUtility.removeDuplicatesAndNoFix(coordinates);
-//        HashMap<String, ArrayList<Coordinate>> sortedCoordinateMap = GpsUtility.sortCoordinatesIntoMap(coordinates);
-//
-//        for (Map.Entry<String, ArrayList<Coordinate>> entry : sortedCoordinateMap.entrySet()) {
-//            String compositeKey = entry.getKey();
-//            ArrayList<Coordinate> coordinatesList = entry.getValue();
-//            applyLogicAndInsert(coordinatesList);
-//        }
     }
 
     public TreeMap<Integer, TreeMap<String, Integer>> retrieveOverallCoordData() {
@@ -85,6 +80,7 @@ public class CoordinateService {
 
         ArrayList<Coordinate> coordinates =
                 (ArrayList<Coordinate>)coordinateDao.findByDate(userId, startDate, endDate, coordRawTableName, true);
+
         System.out.println("running algorithms for routes.. coord size: " + coordinates.size());
         return runAlgorithmsForRoutes(coordinates, ratingMap);
     }
@@ -104,54 +100,13 @@ public class CoordinateService {
         map = removeLessDenseClustersForRoutes(map, 50);
         map = smoothRoutes(map);
 
+        //map = routeFusion(map);
 
-        TreeMap<Integer, ArrayList<Coordinate>> newMap = new TreeMap<>();
-
-        TreeMap<String, Integer> testMap = new TreeMap<>();
-
-        for (Map.Entry<Integer, ArrayList<Coordinate>> entry : map.entrySet()) {
-            ArrayList<Coordinate> coords = entry.getValue();
-            for (Coordinate coord : coords) {
-                double lat = coord.getLatitude();
-                double lng = coord.getLongitude();
-                DecimalFormat df = new DecimalFormat("#.####");
-                df.setRoundingMode(RoundingMode.HALF_EVEN);
-                double newLat = Double.parseDouble(df.format(lat));
-                double newLng = Double.parseDouble(df.format(lng));
-
-                coord.setLatitude(newLat);
-                coord.setLongitude(newLng);
-
-                String compositeKey = df.format(lat) + "," + df.format(lng);
-                Integer coordCountInGrid = testMap.get(compositeKey);
-                if (coordCountInGrid == null) {
-                    testMap.put(compositeKey, 1);
-                } else {
-                    coordCountInGrid++;
-                    testMap.put(compositeKey, coordCountInGrid);
-                }
-            }
-            //  GpsUtility.applyKalmanFiltering(coords, 1, 15);
-
-        }
-
-        for (Map.Entry<String, Integer> entry : testMap.entrySet()) {
-            String key = entry.getKey();
-            String[] coord = key.split(",");
-            double lat = Double.parseDouble(coord[0]);
-            double lng = Double.parseDouble(coord[1]);
-
-        }
 
         HashMap<String, Route> displayMap = sortIntoRoutesWithRating(map);
 
         return displayMap;
     }
-
-
-
-
-
 
     //COORDINATES VIEW-----------------------------------------------------------------------------------------
 
@@ -369,5 +324,55 @@ public class CoordinateService {
         coordinates.removeAll(test);
         return coordinates;
     }
+
+
+    private static final int ROUND_OFF_VALUE = 10000;
+    private TreeMap<Integer, ArrayList<Coordinate>> routeFusion (TreeMap<Integer, ArrayList<Coordinate>> map) {
+
+        TreeMap<String, Integer> testMap = new TreeMap<>();
+
+        for (Map.Entry<Integer, ArrayList<Coordinate>> entry : map.entrySet()) {
+            ArrayList<Coordinate> coords = entry.getValue();
+            Iterator<Coordinate> iter = coords.iterator();
+            while (iter.hasNext()) {
+                Coordinate coord = iter.next();
+                double lat = coord.getLatitude();
+                double lng = coord.getLongitude();
+
+                double roundedLatMultiplied = Math.round(lat * ROUND_OFF_VALUE);
+                double roundedLat = roundedLatMultiplied / ROUND_OFF_VALUE;
+
+                double roundedLongMultiplied = Math.round(lng * ROUND_OFF_VALUE);
+                double roundedLong = roundedLongMultiplied / ROUND_OFF_VALUE;
+
+                String compositeKey = roundedLat + "," + roundedLong;
+
+                Integer coordCountInGrid = testMap.get(compositeKey);
+                if (coordCountInGrid == null) {
+                    testMap.put(compositeKey, 1);
+                    coord.setLatitude(roundedLat);
+                    coord.setLongitude(roundedLong);
+                } else {
+                    iter.remove();
+                }
+            }
+            //GpsUtility.applyKalmanFiltering(coords, 1, 10);
+
+        }
+
+        for (Map.Entry<String, Integer> entry : testMap.entrySet()) {
+            String key = entry.getKey();
+            String[] coord = key.split(",");
+            double lat = Double.parseDouble(coord[0]);
+            double lng = Double.parseDouble(coord[1]);
+
+        }
+
+
+        return map;
+    }
+
+
+
 
 }

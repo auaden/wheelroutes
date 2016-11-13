@@ -287,11 +287,17 @@
             </c:forEach>
         ];
 
+//        var heatmap = new google.maps.visualization.HeatmapLayer({
+//            data: routeCoordinates,
+//            dissipating: false
+//        });
+//        heatmap.setMap(map);
+
         var route = new google.maps.Polyline({
             path: routeCoordinates,
             strokeOpacity: 1,
             strokeColor: Colors[rating],
-            strokeWeight: 5
+            strokeWeight: 2
         });
         route.setMap(map);
         </c:forEach>

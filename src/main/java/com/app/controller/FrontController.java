@@ -122,9 +122,17 @@ public class FrontController {
     public ModelAndView processData() {
         ModelAndView mv = new ModelAndView();
 
-        //23 sep to nov 1
-        HashMap<String, Integer> ratingMap = axisService.retrieveRatingMap(9, "2016-10-06 00:00", "2016-10-06 23:59");
-        coordinateService.processData(9, "2016-10-06 00:00", "2016-10-06 23:59",ratingMap);
+        TreeMap<Integer, TreeMap<String, Integer>> data = coordinateService.retrieveOverallCoordData();
+        for (Map.Entry<Integer, TreeMap<String, Integer>> entry : data.entrySet()) {
+            int userId = entry.getKey();
+            for (Map.Entry<String, Integer> entry2 : entry.getValue().entrySet()) {
+                String date = entry2.getKey();
+                //System.out.println("USERID " + userId + " DATE " + date);
+                HashMap<String, Integer> ratingMap = axisService.retrieveRatingMap(userId, date + " 00:00", date + " 23:59");
+                coordinateService.processData(userId, date + " 00:00", date + " 23:59",ratingMap);
+            }
+        }
+
         mv.setViewName("redirect:landing.do");
         return mv;
     }
@@ -161,12 +169,20 @@ public class FrontController {
     }
 
 //
-
+//@RequestParam("userId") Integer userId,
+//    @RequestParam("startDate") String startDate,
+//    @RequestParam("endDate") String endDate
     @RequestMapping(value = "/process-filter-routes", method = RequestMethod.POST)
-    public ModelAndView processFilterRoutes(@RequestParam("userId") Integer userId,
-                                            @RequestParam("startDate") String startDate,
-                                            @RequestParam("endDate") String endDate) {
-        //timestamp, rating
+    public ModelAndView processFilterRoutes() {
+//        //timestamp, rating
+//        Integer userId = 11;
+//        String startDate = "2016-10-18 00:00";
+//        String endDate = "2016-10-20 23:59";
+
+        Integer userId = 6;
+        String startDate = "2016-10-01 00:00";
+        String endDate = "2016-10-01 23:59";
+
         HashMap<String, Integer> ratingMap = axisService.retrieveRatingMap(userId, startDate, endDate);
 
         HashMap<String, Route> coordinates = coordinateService.startProcessingForRoutes(userId, startDate, endDate, ratingMap);
@@ -202,6 +218,7 @@ public class FrontController {
     @GetMapping(value = "/data-analytics")
     public ModelAndView toDataAnalyticsPage() {
         ModelAndView mv = new ModelAndView("data-analytics");
+        //user ID, date, number of coordinate count
         TreeMap<Integer, TreeMap<String, Integer>> data = coordinateService.retrieveOverallCoordData();
         mv.addObject("coordDataByIdAndTimestamp", data);
         return mv;
