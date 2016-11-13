@@ -11,6 +11,6 @@
     <title>Title</title>
 </head>
 <body>
-<a href="http://localhost:8080/rest/coordinate/coordinates/2/coord2"></a>
+<a href="http://localhost:8080/rest/coordinate/coordinates/11/coord2">SEND DATA</a>
 </body>
 </html>

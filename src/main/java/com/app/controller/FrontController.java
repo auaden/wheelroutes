@@ -297,4 +297,11 @@ public class FrontController {
         userService.modifySensitivity(user, feedbackInt);
         return new ModelAndView("redirect:landing.do");
     }
+
+
+    @GetMapping(value = "/test")
+    public ModelAndView toTest() {
+        ModelAndView mv = new ModelAndView("test");
+        return mv;
+    }
 }

@@ -122,7 +122,7 @@ public class CoordinateRestController {
                 JsonPrimitive latElement = new JsonPrimitive(coord.getLatitude());
                 JsonPrimitive lngElement = new JsonPrimitive(coord.getLongitude());
                 JsonPrimitive numSat = new JsonPrimitive(coord.getNumSat());
-                object.add("userId", new JsonPrimitive(68));
+                object.add("userId", userIdElement);
                 object.add("timestamp", timestampElement);
                 object.add("latitude", latElement);
                 object.add("longitude", lngElement);
@@ -160,6 +160,25 @@ public class CoordinateRestController {
             }
 
             batchCounter++;
+        }
+
+        String postUrl = "http://wheelroutes.icitylab.com/rest/coordinate/coordinates";// put in your url
+        Gson gson = new Gson();
+        HttpClient httpClient = HttpClientBuilder.create().build();
+        HttpPost post = new HttpPost(postUrl);
+
+        StringEntity postingString = null;//gson.tojson() converts your pojo to json
+        try {
+            postingString = new StringEntity(gson.toJson(jArray));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        post.setEntity(postingString);
+        post.setHeader("Content-type", "application/json");
+        try {
+            HttpResponse response = httpClient.execute(post);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
 //        System.out.println(jArray.toString());
