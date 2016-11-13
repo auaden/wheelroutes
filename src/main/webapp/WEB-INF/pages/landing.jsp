@@ -354,11 +354,11 @@
                 "#ff751a",
                 "#db2902"
             ];
-
             <c:forEach var="entry1" items="${viewRoutes}">
-            var rating = ${entry1.value.rating} + 1
+            <c:forEach var="route" items="${entry1.value}">
+            var rating = ${route.rating} + 1
             var routeCoordinates = [
-                <c:forEach var="mapEntry" items="${entry1.value.route}">
+                <c:forEach var="mapEntry" items="${route.route}">
                 //coordinate
                 {lat:${mapEntry.latitude}, lng:${mapEntry.longitude}},
                 </c:forEach>
@@ -371,6 +371,7 @@
                 strokeWeight: 5
             });
             route.setMap(map);
+            </c:forEach>
             </c:forEach>
 
 

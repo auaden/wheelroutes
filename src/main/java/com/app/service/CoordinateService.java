@@ -30,18 +30,65 @@ public class CoordinateService {
     @Autowired
     public String coordProcessedTableName;
 
-    public HashMap<String, Route> retrieveViewCoordinates() {
+    public HashMap<Integer, ArrayList<Route>> retrieveViewCoordinates() {
         ArrayList<Coordinate> coordinates = (ArrayList<Coordinate>) coordinateDao.findAll(coordProcessedTableName, false);
+
+        HashMap<Integer, ArrayList<Coordinate>> splitByUserId = new HashMap<>();
 
         for (Coordinate coordinate : coordinates) {
             int userId = coordinate.getUserId();
 
+            ArrayList<Coordinate> userCoords = splitByUserId.get(userId);
+
+            if (userCoords == null) {
+                ArrayList<Coordinate> newList = new ArrayList<>();
+                newList.add(coordinate);
+                splitByUserId.put(userId, newList);
+            } else {
+                userCoords.add(coordinate);
+                splitByUserId.put(userId, userCoords);
+            }
         }
 
+        HashMap<Integer, ArrayList<Route>> map = new HashMap<>();
+        ArrayList<Route> routes = new ArrayList<>();
+        for (Map.Entry<Integer, ArrayList<Coordinate>> entry : splitByUserId.entrySet()) {
+            int userId = entry.getKey();
+            System.out.println(" user id : " + userId);
+            ArrayList<Coordinate> userCoords = entry.getValue();
+            System.out.println(" size: " + userCoords.size());
 
-        TreeMap<Integer, ArrayList<Coordinate>> map = splitRoutes(coordinates, 30);
-        HashMap<String, Route> displayMap = sortIntoRoutesWithRating(map);
-        return displayMap;
+            TreeMap<Integer, ArrayList<Coordinate>> subMap = splitRoutes(userCoords, 20);
+            HashMap<String, Route> displayMap = sortIntoRoutesWithRating(subMap);
+            for (Map.Entry<String, Route> entry2 : displayMap.entrySet()) {
+                routes.add(entry2.getValue());
+            }
+            //map.putAll(subMap);
+        }
+        System.out.println("routes size " + routes.size());
+
+        int counter = 0;
+        int routeId = 0;
+        for (Route route : routes) {
+            ArrayList<Route> routeList = map.get(routeId);
+            if (routeList == null) {
+                ArrayList<Route> newList = new ArrayList<>();
+                newList.add(route);
+                map.put(routeId, newList);
+            } else {
+                routeList.add(route);
+                map.put(routeId, routeList);
+            }
+
+            if (counter == 100) {
+                routeId++;
+                counter = 0;
+            } else {
+                counter++;
+            }
+        }
+
+        return map;
     }
 
     public HashMap<String, Route> retrieveViewCoordinates(int userId) {
@@ -141,7 +188,7 @@ public class CoordinateService {
         for (Map.Entry<Integer, ArrayList<Coordinate>> entry : routes.entrySet()) {
             ArrayList<Coordinate> coordinates = entry.getValue();
             int routeId = entry.getKey();
-            System.out.println("route id: " + entry.getKey());
+            //System.out.println("route id: " + entry.getKey());
 
             int routeId2 = 1;
 
@@ -172,6 +219,8 @@ public class CoordinateService {
                 }
             }
         }
+
+
 
         return displayMap;
     }
@@ -295,12 +344,17 @@ public class CoordinateService {
         ArrayList<Coordinate> test = new ArrayList<>();
         Iterator iter = coordinates.iterator();
         Coordinate forgottenCoordinate = null;
+
         while(iter.hasNext()){
             Coordinate coordinate;
             Coordinate nextCoordinate;
             if (forgottenCoordinate == null) {
                 coordinate = (Coordinate) iter.next();
-                nextCoordinate = (Coordinate) iter.next();
+                if (iter.hasNext()) {
+                    nextCoordinate = (Coordinate) iter.next();
+                } else {
+                    break;
+                }
             } else {
                 coordinate = forgottenCoordinate;
                 nextCoordinate = (Coordinate) iter.next();

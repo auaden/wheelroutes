@@ -43,8 +43,8 @@ public class FrontController {
     public ModelAndView toLanding() {
         ModelAndView mv = new ModelAndView("landing", "user", new User());
         ArrayList<Obstacle> obstacles = obstacleService.retrieveAllApproved();
-        HashMap<String, Route> displayMap = coordinateService.retrieveViewCoordinates();
-        mv.addObject("viewRoutes", displayMap);
+        HashMap<Integer, ArrayList<Route>> routes = coordinateService.retrieveViewCoordinates();
+        mv.addObject("viewRoutes", routes);
         mv.addObject("obstacles", obstacles);
         return mv;
     }
@@ -169,19 +169,19 @@ public class FrontController {
     }
 
 //
-//@RequestParam("userId") Integer userId,
-//    @RequestParam("startDate") String startDate,
-//    @RequestParam("endDate") String endDate
+
     @RequestMapping(value = "/process-filter-routes", method = RequestMethod.POST)
-    public ModelAndView processFilterRoutes() {
+    public ModelAndView processFilterRoutes(@RequestParam("userId") Integer userId,
+                                            @RequestParam("startDate") String startDate,
+                                            @RequestParam("endDate") String endDate) {
 //        //timestamp, rating
 //        Integer userId = 11;
 //        String startDate = "2016-10-18 00:00";
 //        String endDate = "2016-10-20 23:59";
-
-        Integer userId = 6;
-        String startDate = "2016-10-01 00:00";
-        String endDate = "2016-10-01 23:59";
+//
+//        Integer userId = 6;
+//        String startDate = "2016-10-01 00:00";
+//        String endDate = "2016-10-01 23:59";
 
         HashMap<String, Integer> ratingMap = axisService.retrieveRatingMap(userId, startDate, endDate);
 
