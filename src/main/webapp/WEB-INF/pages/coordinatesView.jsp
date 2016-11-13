@@ -19,7 +19,7 @@
 
     <%--wheelroutes logo--%>
     <link rel="shortcut icon" href="images/favicon.ico" />
-    <title>WheelRoutes Landing Page</title>
+    <title>WheelRoutes View Coordinates Page</title>
 
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
@@ -60,7 +60,8 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="#"><i class="fa fa-wheelchair fa-2x" aria-hidden="true"></i>WheelRoutes</a>
+                <%--<a class="navbar-brand" href="#"><i class="fa fa-wheelchair fa-2x" aria-hidden="true"></i>WheelRoutes</a>--%>
+                <a class="navbar-brand" href="/landing.do"><i class="fa fa-wheelchair fa-2x" aria-hidden="true"></i></a><div id="wheelRoutes">WheelRoutes</div>
             </div>
             <div id="collapse navbar-collapse" class="collapse navbar-collapse">
                 <ul class="nav navbar-nav navbar-right col-lg-1 col-md-5 col-sm-2">
@@ -83,7 +84,7 @@
     </div>
 </nav>
 
-<div id="map" style="height:95%"></div>
+<div id="map" style="height:90%"></div>
 
 <div class="navbar navbar-default navbar-fixed-bottom">
     <div class="container-fluid">

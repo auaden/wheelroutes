@@ -138,7 +138,8 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="#"><i class="fa fa-wheelchair fa-2x" aria-hidden="true"></i>WheelRoutes</a>
+                    <%--<a class="navbar-brand" href="#"><i class="fa fa-wheelchair fa-2x" aria-hidden="true"></i>WheelRoutes</a>--%>
+                    <a class="navbar-brand" href=""><i class="fa fa-wheelchair fa-2x" aria-hidden="true"></i></a><div id="wheelRoutes">WheelRoutes</div>
                 </div>
                 <!-- Collection of nav links and other content for toggling -->
                 <div id="collapse navbar-collapse" class="collapse navbar-collapse">
@@ -556,9 +557,12 @@
         }
     </script>
 
-    <nav class="navbar navbar-default navbar-fixed-bottom">
-        <div class="container">
-            <i>Powered by <a class="orange-text text-lighten-3" href="https://wiki.smu.edu.sg/is480/IS480_Team_wiki%3A_2016T1_HumbleBees">Team HumbleBees</a></i>
+    <nav class="navbar navbar-default navbar-fixed-bottom" style="min-height:25px;height:5%">
+        <div class="container-fluid">
+            <div class="navbar-header col-lg-3 col-md-2 col-sm-2" id="footer">
+                <center>&copy;<a class="orange-text text-lighten-3" href="https://wiki.smu.edu.sg/is480/IS480_Team_wiki%3A_2016T1_HumbleBees">Team HumbleBees</a></center>
+            </div>
+            <%--<i>Powered by <a class="orange-text text-lighten-3" href="https://wiki.smu.edu.sg/is480/IS480_Team_wiki%3A_2016T1_HumbleBees">Team HumbleBees</a></i>--%>
         </div>
     </nav>
 

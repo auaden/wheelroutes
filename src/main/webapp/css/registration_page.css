@@ -9,7 +9,7 @@ body{
 }
 
 .navbar{
-    background-color: #EFAA1F;
+    background-color: #F9DA68 !important;
 }
 
 .well {
@@ -17,7 +17,7 @@ body{
 }
 
 #back{
-    margin-top:5px; margin-left:5px;
+    margin-top:10px; margin-left:5px;
 }
 
 #header{
@@ -44,55 +44,3 @@ body{
     padding-bottom: 10px;
     /*position:absolute;*/
 }
-
-
-
-
-/*html {*/
-    /*font-family: Calibri, Trebuchet, sans-serif;*/
-/*}*/
-
-/*.btn-floating{*/
-    /*margin-left: 10px;*/
-    /*!*padding-left: 5px;*!*/
-    /*background-color: #75ABBC;*/
-/*}*/
-
-/*#bee{*/
-    /*height: 100px;*/
-    /*width: 120px;*/
-/*}*/
-
-/*#humblebee{ margin-top: -40px; margin-left: 100px;}*/
-
-/*#inputEmail, #password{*/
-    /*width: 80%; font-size: 15px; color: black; margin-left: 80px;*/
-/*}*/
-
-/*!*FOR FILE IMAGE UPLOAD*!*/
-/*!*#output{*/
-	/*background-color: white; border-style: none; width: 500px; height: 250px; position:relative; margin-left:100px;*/
-/*}*!*/
-
-/*#output.circle.responsive-img{*/
-    /*!*width: 250px; height: 300px; *!*/
-    /*background-color: white; border-style: none; width: 300px; height: 300px; position:relative; margin-left:150px;*/
-/*}*/
-
-
-/*.header.center.orange-text { font-family: Ocie; margin-bottom:0px;}*/
-
-/*.header.center,.row.center{margin-top: -20px;}*/
-
-/*.btn.right{*/
-    /*font-size: 15px; background-color: #05668D;*/
-/*}*/
-
-/*!*PAGE FOOTER*!*/
-/*.page-footer.orange{*/
-    /*margin-top: 0px;*/
-    /*!*to ensure no spacing aft the map*!*/
-/*}*/
-
-/*.input-field.col.s12{*/
-    /*font-color: black;}*/

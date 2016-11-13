@@ -61,7 +61,8 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="#"><i class="fa fa-wheelchair fa-2x" aria-hidden="true"></i>WheelRoutes</a>
+                    <%--<a class="navbar-brand" href="#"><i class="fa fa-wheelchair fa-2x" aria-hidden="true"></i>WheelRoutes</a>--%>
+                    <a class="navbar-brand" href=""><i class="fa fa-wheelchair fa-2x" aria-hidden="true"></i></a><div id="wheelRoutes">WheelRoutes</div>
                 </div>
                 <div id="collapse navbar-collapse" class="collapse navbar-collapse">
                     <ul class="nav navbar-nav navbar-right col-lg-2 col-md-5 col-sm-2">

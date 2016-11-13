@@ -22,6 +22,12 @@ html,body{
     width: 450px;
 }
 
+#wheelRoutes{
+    margin-top:12px;
+    font-size: 18px;
+    color: #CCA467;
+ }
+
 /*GOOGLE MAP*/
 #map{
     position: relative;
@@ -38,7 +44,7 @@ html,body{
 }
 
 .navbar-fixed-bottom{
-    position: relative;
+    position: absolute;
     margin-top: 0px;
 }
 
@@ -100,5 +106,9 @@ html,body{
 /*in admin page*/
 #back.btn.btn-default{
     margin-top:3px;
+}
+
+#footer{
+    margin-top:5px;
 }
 
