@@ -189,6 +189,11 @@
         </div>
     <%}%>
 
+    <div class="alert alert-info alert-dismissible" role="alert" style="display:none" id="processedObstacle">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true"><b>&times;</b></span></button>
+        <center>You have successfully added an obstacle. Our admin will process your request and display on the map soon.</center>
+    </div>
+
     <% if (request.getAttribute("errorMsg") != null) { %>
     <div class="alert alert-danger alert-dismissible" role="alert">
         <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true"><b>&times;</b></span></button>
@@ -385,6 +390,10 @@
                 });
             </c:if>
 
+            var prev_infowindow;
+            var prev_marker;
+            var previous = false;
+
             //ADDING MARKERS
             function placeMarker(location) {
                 var marker = new google.maps.Marker({
@@ -418,10 +427,19 @@
                     content: reportObstacleDescription
                 });
 
-                infowindow.open(map, marker);
+                if(previous){
+                    prev_infowindow.close();
+                    prev_marker.setMap(null);
+                }
 
-                //setting a delay in opening up the infowindow, i.e. in 800 seconda later
-                setTimeout(function() { infowindow.open(map, marker) }, 800);
+                //to close the previous marker and infowindow if there no obstacle is uploaded
+                infowindow.open(map, marker);
+                prev_infowindow = infowindow;
+                prev_marker = marker;
+                previous = true;
+
+                //setting a delay in opening up the infowindow, i.e. in 900 seconda later
+                setTimeout(function() { infowindow.open(map, marker) }, 900);
 
                 // READING IMAGE FROM USER INPUT AND DISPLAY ON FORM
                 loadFile = function(event) {
