@@ -83,11 +83,11 @@ public class FrontController {
 
         if (errorMsg != null) {
             mv.setViewName("landing");
-            //HashMap<Integer, HashMap<Integer, ArrayList<Coordinate>>>  viewCoordinates = coordinateService.retrieveViewCoordinates(true);
-            //mv.addObject("viewCoordinates", viewCoordinates);
+            HashMap<Integer, ArrayList<Route>> routes = coordinateService.retrieveViewCoordinates(false);
+            mv.addObject("viewRoutes", routes);
             mv.addObject("errorMsg", errorMsg);
         } else {
-            if (user.getEmail().substring(0,5).equals("admin")) {
+            if (user.getEmail().contains("humblebees")) {
                 mv.setViewName("redirect:admin.do");
             } else {
                 mv.setViewName("redirect:landing.do");
@@ -184,7 +184,6 @@ public class FrontController {
 
 
     //FILTER------------------------------------------------------------------------------------------------
-
 
     @RequestMapping(value = "/routesView", method = RequestMethod.GET)
     public ModelAndView toRoutesView() {
