@@ -29,6 +29,9 @@ public class CoordinateService {
     public String coordRawTableName;
 
     @Autowired
+    public String coordTempTableName;
+
+    @Autowired
     public String coordProcessedTableName;
 
     public HashMap<Integer, ArrayList<Route>> retrieveViewCoordinates(boolean isGrid) {
@@ -120,9 +123,9 @@ public class CoordinateService {
         }
     }
 
-    public TreeMap<Integer, TreeMap<String, Integer>> retrieveOverallCoordData() {
+    public TreeMap<Integer, TreeMap<String, Integer>> retrieveOverallCoordData(String tableName) {
         TreeMap<Integer, TreeMap<String, Integer>> overall = new TreeMap<>();
-        overall.putAll(coordinateDao.findOverallDataCollected(coordRawTableName));
+        overall.putAll(coordinateDao.findOverallDataCollected(tableName));
         return overall;
     }
 
@@ -156,7 +159,7 @@ public class CoordinateService {
         map = removeLessDenseClustersForRoutes(map, 50);
         map = smoothRoutes(map);
 
-        map = routeFusion(map);
+        //map = routeFusion(map);
 
         HashMap<String, Route> displayMap = sortIntoRoutesWithRating(map);
 
@@ -482,6 +485,10 @@ public class CoordinateService {
 
 
 
+    }
+
+    public void deleteData() {
+        coordinateDao.deleteAll(coordTempTableName);
     }
 
 

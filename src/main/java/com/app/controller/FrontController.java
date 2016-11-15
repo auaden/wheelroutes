@@ -41,6 +41,15 @@ public class FrontController {
     @Autowired
     private ObstacleService obstacleService;
 
+    @Autowired
+    public String coordRawTableName;
+
+    @Autowired
+    public String coordTempTableName;
+
+    @Autowired
+    public String axisRawTableName;
+
     @RequestMapping(value = "/landing", method = RequestMethod.GET)
     public ModelAndView toLanding() {
         ModelAndView mv = new ModelAndView("landing", "user", new User());
@@ -136,7 +145,8 @@ public class FrontController {
 
         StopWatch watch = new StopWatch();
         watch.start();
-        TreeMap<Integer, TreeMap<String, Integer>> data = coordinateService.retrieveOverallCoordData();
+        TreeMap<Integer, TreeMap<String, Integer>> data = coordinateService.retrieveOverallCoordData(coordRawTableName);
+//        TreeMap<Integer, TreeMap<String, Integer>> data = coordinateService.retrieveOverallCoordData(coordTempTableName);
         for (Map.Entry<Integer, TreeMap<String, Integer>> entry : data.entrySet()) {
             int userId = entry.getKey();
             for (Map.Entry<String, Integer> entry2 : entry.getValue().entrySet()) {
@@ -147,6 +157,8 @@ public class FrontController {
             }
         }
         watch.stop();
+//        axisService.deleteData();
+//        coordinateService.deleteData();
         System.out.println("Total processing time: " + TimeUnit.MILLISECONDS.toMinutes(watch.getTime()) + " mins");
         mv.setViewName("redirect:landing.do");
         return mv;
@@ -233,13 +245,14 @@ public class FrontController {
     public ModelAndView toDataAnalyticsPage() {
         ModelAndView mv = new ModelAndView("data-analytics");
         //user ID, date, number of coordinate count
-        TreeMap<Integer, TreeMap<String, Integer>> data = coordinateService.retrieveOverallCoordData();
-
+        TreeMap<Integer, TreeMap<String, Integer>> coordData = coordinateService.retrieveOverallCoordData(coordRawTableName);
+        TreeMap<Integer, TreeMap<String, Integer>> axisData = coordinateService.retrieveOverallCoordData(axisRawTableName);
         //coordinateService.getTimeSpent(data);
 
 
 
-        mv.addObject("coordDataByIdAndTimestamp", data);
+        mv.addObject("coordDataByIdAndTimestamp", coordData);
+        mv.addObject("axisDataByIdAndTimestamp", axisData);
         return mv;
     }
 

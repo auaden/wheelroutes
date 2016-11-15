@@ -45,6 +45,9 @@ public class CoordinateRestController {
     @Autowired
     private String coordProcessedTableName;
 
+    @Autowired
+    private String coordTempTableName;
+
     @RequestMapping(value="/{tableName}", method=RequestMethod.DELETE)
     public ResponseEntity<Boolean> deleteTable(@PathVariable("tableName") String tableName) {
         coordinateDao.deleteAll(tableName);
@@ -69,7 +72,7 @@ public class CoordinateRestController {
         for (Coordinate c : filteredCoordinates) {
             System.out.println(c.toString());
         }
-        coordinateDao.insertRawBatch(filteredCoordinates, coordRawTableName);
+        coordinateDao.insertRawBatch(filteredCoordinates, coordTempTableName);
     }
 
     @RequestMapping(value = "/coordinates/{tableName}", method=RequestMethod.GET)

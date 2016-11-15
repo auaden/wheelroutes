@@ -26,15 +26,18 @@ public class AxisService {
     @Autowired
     private String axisRawTableName;
 
-    private final double LVL6_SLOPE = 0.4; //150 - anything above is steep
-    private final double LVL5_SLOPE = 0.35; //150 - anything above is steep
+    @Autowired
+    private String axisTempTableName;
+
+    private static final double X_CHANGE_STATIONARY = 0.096;
+    private static final double Y_CHANGE_STATIONARY = 0.132;
+    private static final double Z_CHANGE_STATIONARY = 0.052;
+
     private final double LVL4_SLOPE = 0.3; //100 - anything between NORMAL_SLOPE and STEEP_SLOPE is considered normal slope
     private final double LVL3_SLOPE = 0.25; //100 - anything between NORMAL_SLOPE and STEEP_SLOPE is considered normal slope
     private final double LVL2_SLOPE = 0.2; //50 - anything above SLIGHT_SLOPE and below NORMAL_SLOPE is considered slight slope
     private final double LVL1_SLOPE = 0.15; //50 - anything above SLIGHT_SLOPE and below NORMAL_SLOPE is considered slight slope
 
-    private final double LVL6_BUMP = 1.08; //500
-    private final double LVL5_BUMP = 1.07; //300
     private final double LVL4_BUMP = 1.06; //100
     private final double LVL3_BUMP = 1.05; //500
     private final double LVL2_BUMP = 1.04; //300
@@ -53,6 +56,7 @@ public class AxisService {
 
     public HashMap<String, Integer> retrieveRatingMap(int userId, String startDate, String endDate) {
         ArrayList<Axis> rawAxes = (ArrayList<Axis>) axisDao.findAllByDate(userId, startDate, endDate, axisRawTableName);
+//        ArrayList<Axis> rawAxes = (ArrayList<Axis>) axisDao.findAllByDate(userId, startDate, endDate, axisTempTableName);
         ArrayList<AxisTimeFrame> axisTimeFrames = (ArrayList<AxisTimeFrame>) retrieveSortedAxisTimeFrame(rawAxes);
         //timestamp, rating
         HashMap<String, Integer> toReturn = loadRatingIntoMap(axisTimeFrames);
@@ -94,6 +98,7 @@ public class AxisService {
             for (Map.Entry<Timestamp, ArrayList<Axis>> entry2 : sortedMap.entrySet()) {
                 Timestamp timestamp = entry2.getKey();
                 ArrayList<Axis> axesInMap = entry2.getValue();
+                axesInMap = stationaryFilter(axesInMap);
                 toReturn.add(new AxisTimeFrame(userId, axesInMap, timestamp));
                 //System.out.println("user id: " + userId + " ts: " + timestamp + " size: " + axesInMap.size());
             }
@@ -102,195 +107,172 @@ public class AxisService {
         return toReturn;
     }
 
-    //calculate tilt
-    //flat ground slope
-    public int getSlopeRating(ArrayList<Axis> sortedAxes, int userSensitivity){
-        double maxAbsValue = 0;
-        //double maxRealValue = 0;
-        //Timestamp time = null;
-
-        for(Axis axis:sortedAxes){
-            double currentAbsValue = Math.abs(Math.sin(axis.getxAxis()));
-            if (currentAbsValue>maxAbsValue){
-                maxAbsValue = currentAbsValue;
-            }
-        }
-
-        if(maxAbsValue <= LVL1_SLOPE){
-            return 0;
-        }else if(maxAbsValue < LVL2_SLOPE){
-            return 1 + userSensitivity;
-        }else if(maxAbsValue < LVL3_SLOPE){
-            return 2 + userSensitivity;
-        }else if(maxAbsValue < LVL4_SLOPE){
-            return 3 + userSensitivity;
-        }else if(maxAbsValue < LVL5_SLOPE){
-            return 4 + userSensitivity;
-        }else if(maxAbsValue < LVL6_SLOPE){
-            return 5 + userSensitivity;
-        }else {
-            return 6 + userSensitivity;
-        }
-    }
-
-    //calculate bumpiness
-    //try 2 logic
 
     private static final double UP_BUMP_VALUE = 3.000; //compares each 0.1s
     private final double SLOPE_VARIANCE = 0.050;
-    public int getBumpinessRating(ArrayList<Axis> sortedAxes, int userSensitivity){
-        double totalDiff = 0;
-        for(Axis axis:sortedAxes){
-            double xyz = Math.sqrt(Math.pow(axis.getxAxis(),2)+Math.pow(axis.getyAxis(),2)+Math.pow(axis.getxAxis(),2)); //pythagorean theorem in 3D
-            totalDiff += xyz;
+
+    private int getBumpinessRating(ArrayList<Axis> sortedAxes, int userSensitivity){
+
+        double initialX = 0.0;
+        double initialY = 0.0;
+        double initialZ = 0.0;
+
+        double firstChangeX = 0.0;
+        double firstChangeY = 0.0;
+        double firstChangeZ = 0.0;
+
+        double nextX = 0.0;
+        double nextY = 0.0;
+        double nextZ = 0.0;
+
+        double firstChangeXYZ = 0.0;
+
+        if(sortedAxes != null && sortedAxes.size() > 1){
+            Axis initialAxis = sortedAxes.get(0);
+            initialX = initialAxis.getxAxis();
+            initialY = initialAxis.getyAxis();
+            initialZ = initialAxis.getzAxis();
+
+            Axis nextAxis = sortedAxes.get(1);
+            nextX = nextAxis.getxAxis();
+            nextY = nextAxis.getyAxis();
+            nextZ = nextAxis.getzAxis();
+
+            firstChangeX = nextX - initialX;
+            firstChangeY = nextY - initialY;
+            firstChangeZ = nextZ - initialZ;
+
+            //first variance record
+            firstChangeXYZ = Math.pow(firstChangeX,2) + Math.pow(firstChangeY,2) + Math.pow(firstChangeZ,2);
         }
 
-        totalDiff = (totalDiff / sortedAxes.size()) + (userSensitivity / 100); //convert userSensitivity by 100 to match variability
+        double slopeAverage = 0.0;
 
-        if(totalDiff <= LVL1_BUMP){
-            return 0;
-        } else if(totalDiff <= LVL2_BUMP){
-            return 1;
-        } else if(totalDiff <= LVL3_BUMP){
-            return 2;
-        } else if(totalDiff <= LVL4_BUMP){
-            return 3;
-        } else if(totalDiff <= LVL5_BUMP){
-            return 4;
-        } else if(totalDiff <= LVL6_BUMP){
-            return 5;
-        } else {
-            return 6;
+        double totalChangeOfVariance = firstChangeXYZ;
+        double changeOfVariance = 0.0;
+
+        for(int x = 2; x < sortedAxes.size(); x++){
+
+            Axis axis = sortedAxes.get(x);
+
+            double xAxis = axis.getxAxis();
+            double yAxis = axis.getyAxis();
+            double zAxis = axis.getzAxis();
+
+            //change of 1 record jump
+            double nextChangeX = xAxis - nextX;
+            double nextChangeY = yAxis - nextY;
+            double nextChangeZ = zAxis - nextZ;
+
+            //next variance record
+            double nextChangeXYZ = Math.pow(nextChangeX,2) + Math.pow(nextChangeY,2) + Math.pow(nextChangeZ,2);
+
+            changeOfVariance = Math.abs(nextChangeXYZ - firstChangeXYZ);
+            totalChangeOfVariance += changeOfVariance;
+            firstChangeXYZ = nextChangeXYZ;
+
+
+            //if it's a hard bump show red instantly
+            if(changeOfVariance > UP_BUMP_VALUE){
+                return 6;
+            }
+
+            slopeAverage += Math.abs(Math.sin(initialX));
+            initialX = nextX;
+            initialY = nextY;
+            initialZ = nextZ;
+
+            nextX = xAxis;
+            nextY = yAxis;
+            nextZ = zAxis;
+
+            //slopeVariance += Math.abs(Math.sin(initialX) - Math.sin(nextX));
+
         }
 
-//
-//        double initialX = 0.0;
-//        double initialY = 0.0;
-//        double initialZ = 0.0;
-//
-//        double nextX = 0.0;
-//        double nextY = 0.0;
-//        double nextZ = 0.0;
-//
-//        if(sortedAxes != null && sortedAxes.size() > 0){
-//            Axis initialAxis = sortedAxes.get(0);
-//            initialX = initialAxis.getxAxis();
-//            initialY = initialAxis.getyAxis();
-//            initialZ = initialAxis.getzAxis();
-//
-//            Axis nextAxis = sortedAxes.get(1);
-//            nextX = nextAxis.getxAxis();
-//            nextY = nextAxis.getyAxis();
-//            nextZ = nextAxis.getzAxis();
-//        }
-//
-//        double totalChange = 0.0;
-//        double slopeAverage = 0.0;
-//        double slopeVariance = 0.0;
-//        double changeOfVariance = 0.0;
-//        boolean noChangeForVariance = false;
-//
-//
-//        for(int x = 2; x < sortedAxes.size(); x++){
-//
-//            Axis axis = sortedAxes.get(x);
-//
-//            double xAxis = axis.getxAxis();
-//            double yAxis = axis.getyAxis();
-//            double zAxis = axis.getzAxis();
-//
-//            //change of 2 record jump
-//            double changeX = xAxis - initialX;
-//            double changeY = yAxis - initialY;
-//            double changeZ = zAxis - initialZ;
-//
-//            //change of 1 record jump
-//            double nextChangeX = xAxis - nextX;
-//            double nextChangeY = yAxis - nextY;
-//            double nextChangeZ = zAxis - nextZ;
-//
-//            double changeXYZ = Math.pow(changeX,2) + Math.pow(changeY,2) + Math.pow(changeZ,2);
-//            double nextChangeXYZ = Math.pow(nextChangeX,2) + Math.pow(nextChangeY,2) + Math.pow(nextChangeZ,2);
-//
-////            //if it's a hard bump show red instantly
-////            if(nextChangeXYZ > UP_BUMP_VALUE){
-////                return 6;
-////            }
-//
-//            initialX = nextX;
-//            initialY = nextY;
-//            initialZ = nextZ;
-//
-//            nextX = xAxis;
-//            nextY = yAxis;
-//            nextZ = zAxis;
-//
-//            slopeVariance += Math.abs(Math.sin(initialX) - Math.sin(nextX));
-//            slopeAverage += Math.abs(Math.sin(initialX));
-//            totalChange += nextChangeXYZ;
-//        }
-//
-//        int rating = 1;
-//
-//        if(totalChange < LVL1_BUMP){
-//            return 0;
-//        }else if(totalChange >= LVL1_BUMP && totalChange <LVL2_BUMP){
-//            return 1;
-//        }else if(totalChange >= LVL2_BUMP && totalChange < LVL3_BUMP){
-//            return 2;
-//        }else if(totalChange >= LVL3_BUMP && totalChange < LVL4_BUMP){
-//            return 3;
-//        }else if(totalChange >= LVL4_BUMP && totalChange < LVL5_BUMP){
-//            return 4;
-//        }else if(totalChange >= LVL5_BUMP && totalChange < LVL6_BUMP){
-//            return 5;
-//        }else if(totalChange >= LVL6_BUMP){
-//            return 6;
-//        }
-//
-//        slopeVariance = slopeVariance/sortedAxes.size();
-//        slopeAverage = slopeAverage/sortedAxes.size();
-//
-//        if(slopeVariance > SLOPE_VARIANCE){
-//            //if the slopeAverage is affected by the bumpy path, the slopeAverage is not useful for measuring slope
-//            rating = rating;
-//        } else if(slopeAverage < LVL1_SLOPE){
-//            return 0;
-//        }else if (slopeAverage >= LVL1_SLOPE && slopeAverage < LVL2_SLOPE){
-//            return 1;
-//        }else if (slopeAverage >= LVL2_SLOPE && slopeAverage < LVL3_SLOPE){
-//            return 2;
-//        }else if (slopeAverage >= LVL3_SLOPE && slopeAverage < LVL4_SLOPE){
-//            return 3;
-//        }else if (slopeAverage >= LVL4_SLOPE && slopeAverage < LVL5_SLOPE){
-//            return 4;
-//        }else if(slopeAverage >= LVL5_SLOPE){
-//            return 5;
-//        }else if(slopeAverage >= LVL6_SLOPE){
-//            return 6;
-//        }
-//
-//
-//        return 1;
+        int rating = 0;
 
+        if(totalChangeOfVariance < LVL1_BUMP){
+            rating = 0;
+        }else if(totalChangeOfVariance >= LVL1_BUMP && totalChangeOfVariance <LVL2_BUMP){
+            rating = 1;
+        }else if(totalChangeOfVariance >= LVL2_BUMP && totalChangeOfVariance < LVL3_BUMP){
+            rating = 2;
+        }else if(totalChangeOfVariance >= LVL3_BUMP && totalChangeOfVariance < LVL4_BUMP){
+            rating = 3;
+        }else if(totalChangeOfVariance >= LVL4_BUMP){
+            rating = 4;
+        }
+
+        //slopeVariance = slopeVariance/data.size();
+        slopeAverage = slopeAverage/sortedAxes.size();
+
+        if(slopeAverage < LVL1_SLOPE){
+            rating += 0;
+        }else if (slopeAverage >= LVL1_SLOPE && slopeAverage < LVL2_SLOPE){
+            rating += 1;
+        }else if (slopeAverage >= LVL2_SLOPE && slopeAverage < LVL3_SLOPE){
+            rating += 2;
+        }else if (slopeAverage >= LVL3_SLOPE && slopeAverage < LVL4_SLOPE){
+            rating += 3;
+        }else if (slopeAverage >= LVL4_SLOPE){
+            rating += 4;
+        }
+
+        if(rating >= 4){
+            rating = 4;
+        }
+
+        //System.out.println("rating:  " + rating);
+        return rating;
+    }
+
+    private ArrayList<Axis> stationaryFilter(ArrayList<Axis> dataList){
+
+        ArrayList<Axis> toReturn = new ArrayList<>();
+
+        if(dataList.size() > 0){
+
+            Axis initial = dataList.get(0);
+            double initialX = initial.getxAxis();
+            double initialY = initial.getyAxis();
+            double initialZ = initial.getzAxis();
+
+
+            for(int i = 0; i < dataList.size(); i++){
+                Axis current = dataList.get(i);
+                int userId = current.getUserId();
+                java.sql.Timestamp ts = current.getTimestamp();
+                double currentX = current.getxAxis();
+                double currentY = current.getyAxis();
+                double currentZ = current.getzAxis();
+
+                double diffX = Math.abs(currentX - initialX);
+                double diffY = Math.abs(currentY - initialY);
+                double diffZ = Math.abs(currentZ - initialZ);
+
+                if(diffX > X_CHANGE_STATIONARY){
+                    initialX = currentX;
+                }
+
+                if(diffY > Y_CHANGE_STATIONARY){
+                    initialY = currentY;
+                }
+
+                if(diffZ > Z_CHANGE_STATIONARY){
+                    initialZ = currentZ;
+                }
+
+                //System.out.println("xAxis: " + initialX + "  yAxis: " + initialY + "  zAxis: " + initialZ);
+
+                toReturn.add(new Axis(userId, ts, initialX, initialY, initialZ));
+            }
+        }
+
+        return toReturn;
 
     }
 
-    //based on calculated tilt and bumpiness, come up with a calculation for coloring
-//    public List<AxisTimeFrame> calculateAccessibility(int userSensitivity){
-//        //initiate all variables
-//        //what variables do i have?
-////        List<AxisTimeFrame> sortedAxisTimeFrames = retrieveSortedAxisTimeFrame("mtaxis");
-////
-////        for (AxisTimeFrame axisTimeFrame:sortedAxisTimeFrames) {
-////            int bRate = getBumpinessRating((ArrayList<Axis>)axisTimeFrame.getAxes(), userSensitivity);
-////            int sRate = getSlopeRating((ArrayList<Axis>)axisTimeFrame.getAxes(), userSensitivity);
-////            axisTimeFrame.setAccessibilityRate(bRate + sRate);
-////        }
-////
-////        return sortedAxisTimeFrames;
-//
-//    }
 
     private HashMap<String, Integer> loadRatingIntoMap (ArrayList<AxisTimeFrame> axisTimeFrames) {
         HashMap<String, Integer> toReturn = new HashMap<>();
@@ -302,6 +284,10 @@ public class AxisService {
             toReturn.put(userId + "," + timestamp, bumpinessRating);
         }
         return toReturn;
+    }
+
+    public void deleteData() {
+        axisDao.deleteAll(axisTempTableName);
     }
 
 

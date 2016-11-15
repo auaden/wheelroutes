@@ -105,7 +105,7 @@
                                 <td>${entry.email}</td>
                                 <td>${entry.timestamp}</td>
                                 <%--<td><img src="http://wheelroutes.icitylab.com/rest/obstacle/${entry.latitude}/${entry.longitude}/" style="width:200px; height:200px"></td>--%>
-                                <td><img src="http://localhost:8080/rest/obstacle/${entry.latitude}/${entry.longitude}/" style="width:200px; height:200px"></td>
+                                <td><img src="http://wheelroutes.icitylab.com/rest/obstacle/${entry.latitude}/${entry.longitude}/" style="width:200px; height:200px"></td>
                                 <td>${entry.description}</td>
                                 <td>${entry.approved}</td>
                                 <td>

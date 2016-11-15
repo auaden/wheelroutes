@@ -36,10 +36,24 @@ public class AppConfig {
     private String coordRawTableName;
     @Value("${axis.raw}")
     private String axisRawTableName;
+    @Value("${coord.temp}")
+    private String coordTempTableName;
+    @Value("${axis.temp}")
+    private String axisTempTableName;
 
     @Bean
     public String coordProcessedTableName() {
         return coordProcessedTableName;
+    }
+
+    @Bean
+    public String coordTempTableName() {
+        return coordTempTableName;
+    }
+
+    @Bean
+    public String axisTempTableName() {
+        return axisTempTableName;
     }
 
     @Bean
@@ -56,6 +70,9 @@ public class AppConfig {
     public String axisRawTableName() {
         return axisRawTableName;
     }
+
+
+
 
     @Bean
     public InternalResourceViewResolver getInternalResourceViewResolver() {

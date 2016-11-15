@@ -84,7 +84,6 @@ public class CoordinateDao {
     }
 
 
-
     public TreeMap<Integer, TreeMap<String, Integer>> findOverallDataCollected(String tableName) {
         final TreeMap<Integer, TreeMap<String, Integer>> toReturn = new TreeMap<>();
         String query = "select \"userId\", timestamp::date, count(\"userId\")" +
@@ -159,8 +158,8 @@ public class CoordinateDao {
                             double lat = resultSet.getDouble("latitude");
                             double lng = resultSet.getDouble("longitude");
                             int numSat = resultSet.getInt("numSatellite");
-                            //if (resultSet.getString("timestamp").trim().equals("0") || lat == 0 || lng == 0 || numSat < 6) {
-                            if (resultSet.getString("timestamp").trim().equals("0")) {
+                            if (resultSet.getString("timestamp").trim().equals("0") || lat == 0 || lng == 0 || numSat < 6) {
+//                            if (resultSet.getString("timestamp").trim().equals("0")) {
                                 return null;
                             } else {
                                 Timestamp timestamp = Timestamp.valueOf(resultSet.getString("timestamp"));
