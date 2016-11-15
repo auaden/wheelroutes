@@ -298,16 +298,29 @@
             btnback.click(function (e) {
                 if (current > 1) {
                     current = current - 2;
-                    btnnext.trigger('click');
                 }
+                btnnext.trigger('click');
                 hideButtons(current);
                 e.preventDefault();
             })
 
-            <%if (request.getAttribute("authUser") != null) {%>
-                $('#ratingModal').modal('toggle');
-            <%}%>
+            <%if(request.getAttribute("authUser") != null ) {
+                User user = (User) request.getAttribute("authUser");
+                if (!user.getEmail().contains("humblebees")) { %>
+                    $('#ratingModal').modal('toggle');
+            <%}}%>
         });
+
+        //checks if user reloads the page after login
+        <%--if(window.performance){--%>
+            <%--if(performance.navigation.type  == 1){--%>
+                <%--console.log('page reloaded');--%>
+                <%--<%if (request.getAttribute("firstLogin") != null){--%>
+                        <%--request.setAttribute("firstLogin",null);--%>
+                    <%--}--%>
+                <%--%>--%>
+            <%--}--%>
+        <%--}--%>
 
         // Change progress bar action
         setProgress = function(currstep){
