@@ -66,7 +66,7 @@
                 </div>
                 <div id="collapse navbar-collapse" class="collapse navbar-collapse">
                     <ul class="nav navbar-nav navbar-right col-lg-2 col-md-5 col-sm-2">
-                        <a href="/landing.do"><button class="btn btn-default" type="button" id="back">Back</button></a>
+                        <a href="/landing.do"><button class="btn btn-default" type="button" id="home"><span class="glyphicon glyphicon-circle-arrow-left" aria-hidden="true"></span> Home</button></a>
                     </ul>
                 </div>
             </div>

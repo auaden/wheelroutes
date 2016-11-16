@@ -176,8 +176,12 @@
                                 <%--for logged in user: logout function--%>
                             <%
                                 }else{
-                            %>
-                                <a href="/process-logout.do"><button class="btn btn-warning" type="button" id="logout">Logout</button></a>
+                                    User user = (User) request.getAttribute("authUser");
+                                    boolean isAdmin = user.getEmail().contains("humblebees");
+                                    if(isAdmin){%>
+                                        <a href="/admin.do"><button class="btn btn-default" type="button" id="admin"><span class="glyphicon glyphicon-circle-arrow-right" aria-hidden="true"></span> Admin</button></a>
+                                    <%}%>
+                                    <a href="/process-logout.do"><button class="btn btn-warning" type="button" id="logout">Logout</button></a>
                             <%}%>
                             <%--<button class="btn btn-warning" type="button" id="drop" onclick="initMap.drop()" style="color:default">--%>
                                 <%--Obstacle Reported--%>
@@ -284,7 +288,7 @@
                             setProgress(current);
                         }
 
-                    }else{
+                    } else{
                         widget.show();
                         widget.not(':eq('+(current++)+')').hide();
                         setProgress(current);
