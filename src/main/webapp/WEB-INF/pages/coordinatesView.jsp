@@ -65,7 +65,7 @@
             </div>
             <div id="collapse navbar-collapse" class="collapse navbar-collapse">
                 <ul class="nav navbar-nav navbar-right col-lg-1 col-md-5 col-sm-2">
-                    <a href="/admin.do"><button class="btn btn-default" type="button" id="back">Back</button></a>
+                    <a href="/admin.do"><button class="btn btn-default" type="button" id="back"><span class="glyphicon glyphicon-circle-arrow-left" aria-hidden="true"></span> Back</button></a>
                 </ul>
                 <ul class="nav navbar-nav navbar-right col-lg-2 col-md-5 col-sm-2">
                     Time: <button type="button" id="timePlay" class="btn btn-default" disabled="disabled">00:00:00</button>
