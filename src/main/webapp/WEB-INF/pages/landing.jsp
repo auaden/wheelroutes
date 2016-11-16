@@ -388,10 +388,8 @@
             var Colors = [
                 "#000000",
                 "#07cc04",
-                "#99ff33",
                 "#ccff33",
                 "#ffff00",
-                "#ff9933",
                 "#ff751a",
                 "#db2902"
             ];
@@ -406,9 +404,9 @@
 
             var route = new google.maps.Polyline({
                 path: routeCoordinates,
-                strokeOpacity: 0.6,
+                strokeOpacity: 0.8,
                 strokeColor: Colors[${route.rating} + 1],
-                strokeWeight: 12
+                strokeWeight: 10
             });
             route.setMap(map);
             </c:forEach>

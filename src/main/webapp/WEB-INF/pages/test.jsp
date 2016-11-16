@@ -11,13 +11,7 @@
     <title>Title</title>
 </head>
 <body>
-<a href="http://localhost:8080/rest/coordinate/coordinates/2/coord2">SEND COORD DATA 2</a><br>
-<a href="http://localhost:8080/rest/coordinate/coordinates/5/coord2">SEND COORD DATA 5</a><br>
-<a href="http://localhost:8080/rest/coordinate/coordinates/10/coord2">SEND COORD DATA 10</a><br>
-
-<a href="http://localhost:8080/rest/coordinate/coordinates/11/zack2coord">SEND COORD DATA 11 (zack2 coord)</a><br>
-
-<a href="http://localhost:8080/rest/axis/axes/migrate/migrateAxis">SEND AXIS DATA</a><br>
+<a href="http://localhost:8080/rest/coordinate/send/coordinates">SEND processed</a><br>
 
 
 </body>

@@ -209,9 +209,7 @@ public class FrontController {
                                             @RequestParam("startDate") String startDate,
                                             @RequestParam("endDate") String endDate) {
 
-        HashMap<String, Integer> ratingMap = axisService.retrieveRatingMap(userId, startDate, endDate);
-
-        HashMap<String, Route> coordinates = coordinateService.startProcessingForRoutes(userId, startDate, endDate, ratingMap);
+        HashMap<String, Route> coordinates = coordinateService.retrieveViewCoordinates(userId, startDate, endDate);
         HashMap<String, Integer> dateMap = sortDateInputIntoMap(userId, startDate, endDate);
 
         ModelAndView mv = new ModelAndView("routesView");
@@ -230,8 +228,7 @@ public class FrontController {
                                             @RequestParam("startDate") String startDate,
                                             @RequestParam("endDate") String endDate) {
 
-        HashMap<String, Integer> ratingMap = axisService.retrieveRatingMap(userId, startDate, endDate);
-        ArrayList<Coordinate> coordinates = coordinateService.startProcessingForCoordinates(userId, startDate, endDate, ratingMap);
+        ArrayList<Coordinate> coordinates = coordinateService.retrieveProcessedData(userId, startDate, endDate);
         HashMap<String, Integer> dateMap = sortDateInputIntoMap(userId, startDate, endDate);
 
         ModelAndView mv = new ModelAndView("coordinatesView");

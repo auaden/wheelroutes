@@ -103,8 +103,8 @@ public class CoordinateService {
         return map;
     }
 
-    public HashMap<String, Route> retrieveViewCoordinates(int userId) {
-        ArrayList<Coordinate> coordinates = (ArrayList<Coordinate>) coordinateDao.findById(userId, coordProcessedTableName, false);
+    public HashMap<String, Route> retrieveViewCoordinates(int userId, String startDate, String endDate) {
+        ArrayList<Coordinate> coordinates = (ArrayList<Coordinate>) coordinateDao.findByDate(userId, startDate, endDate, coordProcessedTableName, false);
         TreeMap<Integer, ArrayList<Coordinate>> map = splitRoutes(coordinates, 20);
         HashMap<String, Route> displayMap = sortIntoRoutesWithRating(map);
         return displayMap;
@@ -491,6 +491,9 @@ public class CoordinateService {
         coordinateDao.deleteAll(coordTempTableName);
     }
 
-
+    public ArrayList<Coordinate> retrieveProcessedData(int userId, String startDate, String endDate) {
+        ArrayList<Coordinate> coordinates = (ArrayList<Coordinate>) coordinateDao.findByDate(userId, startDate, endDate, coordProcessedTableName, false);
+        return coordinates;
+    }
 
 }
