@@ -536,29 +536,11 @@
                 }
                 return color;
             }
-
-            // ERORR FOR RETRIEVING USER'S GEOLOCATION
-            function showError(error) {
-                switch(error.code) {
-                    case error.PERMISSION_DENIED:
-                        alert("User denied the request for Geolocation.");
-                        break;
-                    case error.POSITION_UNAVAILABLE:
-                        alert("Location information is unavailable.");
-                        break;
-                    case error.TIMEOUT:
-                        alert("The request to get user location timed out.");
-                        break;
-                    case error.UNKNOWN_ERROR:
-                        alert("An unknown error occurred.");
-                        break;
-                }
-            }
         }
 
         //for search function at the nav bar to allow user to search for text locations within the Google Map
         function geocodeAddress(geocoder, resultsMap) {
-            var address = document.getElementById('addressSearch').value;
+            var address = document.getElementById('addressSearch').value + "Singapore";
             geocoder.geocode({'address': address}, function(results, status) {
                 if (status === 'OK') {
                     defaultLat = results[0].geometry.location.lat();
@@ -566,9 +548,28 @@
                     defaultZoomLevel = 16;
                     initMap();
                 } else {
-                    alert('Geocode was not successful for the following reason: ' + status);
+//                    alert('Geocode was not successful for the following reason: ' + status);
+                    showError(status);
                 }
             });
+        }
+
+        // ERORR FOR RETRIEVING USER'S GEOLOCATION
+        function showError(error) {
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    alert("User denied the request for Geolocation.");
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    alert("Location information is unavailable.");
+                    break;
+                case error.TIMEOUT:
+                    alert("The request to get user location timed out.");
+                    break;
+                case error.UNKNOWN_ERROR:
+                    alert("An unknown error occurred.");
+                    break;
+            }
         }
     </script>
 

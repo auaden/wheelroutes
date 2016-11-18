@@ -96,7 +96,6 @@
                             <th>Timestamp</th>
                             <th>Obstacle</th>
                             <th>Description</th>
-                            <th>Approved?</th>
                             <th>Action</th>
                         </tr>
                          <c:forEach var="entry" items="${unapprovedObstacles}" varStatus="loop">
@@ -107,7 +106,6 @@
                                 <%--<td><img src="http://wheelroutes.icitylab.com/rest/obstacle/${entry.latitude}/${entry.longitude}/" style="width:200px; height:200px"></td>--%>
                                 <td><img src="http://wheelroutes.icitylab.com/rest/obstacle/${entry.latitude}/${entry.longitude}/" style="width:200px; height:200px"></td>
                                 <td>${entry.description}</td>
-                                <td>${entry.approved}</td>
                                 <td>
                                     <div class="container-fluid">
                                         <div class="row">
