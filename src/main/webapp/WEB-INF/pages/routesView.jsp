@@ -34,6 +34,17 @@
 </head>
 
 <body>
+<%
+    if (request.getAttribute("authUser") == null) {
+        response.sendRedirect("/landing.do");
+    } else {
+        User user = (User) request.getAttribute("authUser");
+        if (!user.getEmail().contains("humblebees")) {
+            response.sendRedirect("/landing.do");
+        }
+    }
+%>
+
 <%--hidden form field for processing of filter inputs--%>
 <div class="filterResults">
     <form id="filterForm" action="/process-filter-routes.do"  method="POST"> 

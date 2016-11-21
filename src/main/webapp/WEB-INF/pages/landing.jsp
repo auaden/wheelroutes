@@ -150,6 +150,11 @@
                     <%
                         if (request.getAttribute("authUser") != null) {
                             User user = (User) request.getAttribute("authUser");
+                            if(session.getAttribute("firstLogin") == null) {
+                                session.setAttribute("firstLogin", "first");
+                            } else {
+                                session.setAttribute("firstLogin", "subsequent");
+                            }
                     %>
                         <p class="navbar-text"><i>Signed in as <b><%=user.getEmail()%></b></i></p>
                     <%}%>
@@ -168,6 +173,7 @@
                         <div class="btn-group" role="group" aria-label="...">
                             <%
                                 if (request.getAttribute("authUser") == null) {
+                                    session.removeAttribute("firstLogin");
                             %>
                                 <button type="button" class="btn btn-default" data-toggle="modal" data-target="#exampleModal" id="login"
                                         style="background-color:#565656; color: white">Login
@@ -308,14 +314,15 @@
                 e.preventDefault();
             })
 
-            <%if(request.getAttribute("authUser") != null ) {
+            <%if(request.getAttribute("authUser") != null) {
+                String loginStatus = (String)session.getAttribute("firstLogin");
                 User user = (User) request.getAttribute("authUser");
-                if (!user.getEmail().contains("humblebees")) { %>
+                if (!user.getEmail().contains("humblebees") && loginStatus != null && !loginStatus.equals("first")) { %>
                     $('#ratingModal').modal('toggle');
             <%}}%>
         });
 
-        //checks if user reloads the page after login
+        <%--//checks if user reloads the page after login--%>
         <%--if(window.performance){--%>
             <%--if(performance.navigation.type  == 1){--%>
                 <%--console.log('page reloaded');--%>
