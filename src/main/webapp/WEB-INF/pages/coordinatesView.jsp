@@ -154,6 +154,8 @@
     var defaultLng = 103.814071;
     var defaultZoomLevel = 12;
 
+    var image = 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png';
+
     function TwoDigits(val){
         if (val < 10){
             return "0" + val;
@@ -294,14 +296,50 @@
         ];
 
         var i = 0;
-        <c:forEach var="entry" items="${viewCoordinates}">
-        var position = {lat:${entry.latitude}, lng:${entry.longitude}}
+        var array = "${viewCoordinates}";
+        <c:forEach var="entry" items="${viewCoordinates}" varStatus="status">
+        var position = {lat:${entry.latitude}, lng:${entry.longitude}};
         var ratingColor = Colors[${entry.rating} + 1];
 
         var dateString = "${entry.timestamp}".substring(0,10);
         <%--console.log("Time: " + "${entry.timestamp}");--%>
         var timeString = "${entry.timestamp}".substring(11,22);
 
+        //for start marker to mark the start of the route
+        <c:if test="${status.first}">
+            var firstMarker = new google.maps.Marker({
+                position: position,
+                map: map,
+                animation: google.maps.Animation.DROP,
+                icon: image
+            });
+
+            var firstInfowindow = new google.maps.InfoWindow({
+                content: "<b>Start Timestamp:</b> " + dateString + ", " + timeString
+            });
+
+            firstMarker.addListener('click', function () {
+                firstInfowindow.open(map, firstMarker);
+            });
+
+        </c:if>
+        //for last marker to mark the end of the journey
+        <c:if test="${status.last}">
+            var lastMarker = new google.maps.Marker({
+                position: position,
+                map: map,
+                animation: google.maps.Animation.DROP,
+                icon: image
+            });
+
+            var lastInfowindow = new google.maps.InfoWindow({
+                content: "<b>End Timestamp:</b> " + dateString + ", " + timeString
+            });
+
+            lastMarker.addListener('click', function () {
+                lastInfowindow.open(map, lastMarker);
+            });
+        </c:if>
         addMarkerWithTimeout(position, i * 100, ratingColor, timeString, dateString);
         i++;
         </c:forEach>
@@ -310,6 +348,7 @@
     function addMarkerWithTimeout(position, timeout, color, timeString, dateString) {
 //        $("#time.btn.btn-default").text(timestamp);
 //        $("#date.btn.btn-default").text(timestamp);
+
         window.setTimeout(function() {
             markers.push(new google.maps.Marker({
                 position: position,
