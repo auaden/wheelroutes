@@ -55,8 +55,9 @@ public class AxisService {
     }
 
     public HashMap<String, Integer> retrieveRatingMap(int userId, String startDate, String endDate) {
-        ArrayList<Axis> rawAxes = (ArrayList<Axis>) axisDao.findAllByDate(userId, startDate, endDate, axisRawTableName);
-//        ArrayList<Axis> rawAxes = (ArrayList<Axis>) axisDao.findAllByDate(userId, startDate, endDate, axisTempTableName);
+//        ArrayList<Axis> rawAxes = (ArrayList<Axis>) axisDao.findAllByDate(userId, startDate, endDate, axisRawTableName);
+        ArrayList<Axis> rawAxes = (ArrayList<Axis>) axisDao.findAllByDate(userId, startDate, endDate, axisTempTableName);
+        axisDao.insertBatch(rawAxes, axisRawTableName);
         ArrayList<AxisTimeFrame> axisTimeFrames = (ArrayList<AxisTimeFrame>) retrieveSortedAxisTimeFrame(rawAxes);
         //timestamp, rating
         HashMap<String, Integer> toReturn = loadRatingIntoMap(axisTimeFrames);

@@ -145,20 +145,20 @@ public class FrontController {
 
         StopWatch watch = new StopWatch();
         watch.start();
-        TreeMap<Integer, TreeMap<String, Integer>> data = coordinateService.retrieveOverallCoordData(coordRawTableName);
-//        TreeMap<Integer, TreeMap<String, Integer>> data = coordinateService.retrieveOverallCoordData(coordTempTableName);
+        //TreeMap<Integer, TreeMap<String, Integer>> data = coordinateService.retrieveOverallCoordData(coordRawTableName);
+        TreeMap<Integer, TreeMap<String, Integer>> data = coordinateService.retrieveOverallCoordData(coordTempTableName);
         for (Map.Entry<Integer, TreeMap<String, Integer>> entry : data.entrySet()) {
             int userId = entry.getKey();
             for (Map.Entry<String, Integer> entry2 : entry.getValue().entrySet()) {
                 String date = entry2.getKey();
                 //System.out.println("USERID " + userId + " DATE " + date);
                 HashMap<String, Integer> ratingMap = axisService.retrieveRatingMap(userId, date + " 00:00", date + " 23:59");
-                coordinateService.processData(userId, date + " 00:00", date + " 23:59",ratingMap);
+                coordinateService.processData(userId, date + " 00:00", date + " 23:59", ratingMap);
             }
         }
         watch.stop();
-//        axisService.deleteData();
-//        coordinateService.deleteData();
+        axisService.deleteData();
+        coordinateService.deleteData();
         System.out.println("Total processing time: " + TimeUnit.MILLISECONDS.toMinutes(watch.getTime()) + " mins");
         mv.setViewName("redirect:landing.do");
         return mv;
@@ -209,9 +209,12 @@ public class FrontController {
                                             @RequestParam("startDate") String startDate,
                                             @RequestParam("endDate") String endDate) {
 
-        HashMap<String, Route> coordinates = coordinateService.retrieveViewCoordinates(userId, startDate, endDate);
-        HashMap<String, Integer> dateMap = sortDateInputIntoMap(userId, startDate, endDate);
+        //HashMap<String, Route> coordinates = coordinateService.retrieveViewCoordinates(userId, startDate, endDate);
 
+        HashMap<String, Integer> ratingMap = axisService.retrieveRatingMap(userId, startDate, endDate);
+        HashMap<String, Route> coordinates = coordinateService.startProcessingForRoutes(userId, startDate, endDate, ratingMap);
+
+        HashMap<String, Integer> dateMap = sortDateInputIntoMap(userId, startDate, endDate);
         ModelAndView mv = new ModelAndView("routesView");
         mv.addObject("viewCoordinates", coordinates);
         mv.addObject("dateMap", dateMap);

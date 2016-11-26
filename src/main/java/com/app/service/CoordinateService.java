@@ -112,7 +112,8 @@ public class CoordinateService {
 
     public void processData(int userId, String startDate, String endDate, HashMap<String, Integer> ratingMap) {
         ArrayList<Coordinate> coordinates =
-                (ArrayList<Coordinate>)coordinateDao.findByDate(userId, startDate, endDate, coordRawTableName, true);
+                (ArrayList<Coordinate>)coordinateDao.findByDate(userId, startDate, endDate, coordTempTableName, true);
+        coordinateDao.insertBatch(coordinates, coordRawTableName);
         System.out.println("running algorithms for routes.. coord size: " + coordinates.size());
         HashMap<String, Route> result = runAlgorithmsForRoutes(coordinates, ratingMap);
         for (Map.Entry<String, Route> entry : result.entrySet()) {
