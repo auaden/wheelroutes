@@ -31,7 +31,7 @@
 <%--<body onload="checkCookie()">--%>
 <body>
     <%--Modal for login function--%>
-    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" data-backdrop="false">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -113,6 +113,14 @@
                             </center>
                         </div>
                         <div class="step well">
+                            <%if(request.getAttribute("authUser") != null) {
+                                String loginStatus = (String)session.getAttribute("firstLogin");
+                                if(loginStatus!= null && loginStatus.equals("subsequent")){
+                                    session.setAttribute("firstLogin", "rating");
+                                }
+//                                session.setAttribute("firstLogin", "first");
+                                System.out.println("RATING: " + session.getAttribute("firstLogin"));
+                            }%>
                             <center>Thank you for your input!</center>
                         </div>
                     </div>
@@ -124,6 +132,32 @@
                 </form>
             </div>
         </div>
+    </div>
+
+    <div class="modal fade" id="legendModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title"><center>Colour Legend</center></h4>
+                </div>
+                <div class="modal-body">
+                    <p><center><img id = "colour_rating" src="../../images/colour_rating.PNG" alt="Colour Rating" class="responsive-img right-align"></center></p>
+                    <center><p>The colours represent different rating level on a route, considering the presence of bumps and slopes. </p><p>It reflects the user's sensitivity based on his/her pain level and sitting balance.
+                        <font color="#07CC04">Green </font> represents a smooth route and <font color="#DB2902">red </font> represents a bumpy route, with <font color="#FFFF00">yellow </font> in-between.</p></center>
+                </div>
+                <div class="modal-footer">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-lg-6 col-lg-offset-3">
+                                <!-- <button type="button" class="btn btn-default" data-dismiss="modal">Close</button> -->
+                                <button type="button" class="btn btn-block btn-primary" data-dismiss="modal">Okay, got it!</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
     </div>
 
     <!-- Fixed navbar -->
@@ -150,8 +184,11 @@
                     <%
                         if (request.getAttribute("authUser") != null) {
                             User user = (User) request.getAttribute("authUser");
-                            if(session.getAttribute("firstLogin") == null) {
+                            String loginStatus = (String)session.getAttribute("firstLogin");
+                            if(loginStatus == null) {
                                 session.setAttribute("firstLogin", "first");
+                            } else if(loginStatus.equals("rating")){
+                                session.setAttribute("firstLogin", "afterRating");
                             } else {
                                 session.setAttribute("firstLogin", "subsequent");
                             }
@@ -317,7 +354,8 @@
             <%if(request.getAttribute("authUser") != null) {
                 String loginStatus = (String)session.getAttribute("firstLogin");
                 User user = (User) request.getAttribute("authUser");
-                if (!user.getEmail().contains("humblebees") && loginStatus != null && !loginStatus.equals("first")) { %>
+                //modal will only be displayed for normal users, except for admin and subsequent login users
+                if (!user.getEmail().contains("humblebees") && loginStatus != null && loginStatus.equals("subsequent")) { %>
                     $('#ratingModal').modal('toggle');
             <%}}%>
         });
@@ -522,8 +560,8 @@
                         '<p><b>Description:</b></p>' +
                         '<p>' + desc + '</p>' +
                         '<b>Timestamp: </b>' + ts +
-//                        '<p><center><img src="http://wheelroutes.icitylab.com/rest/obstacle/'+ lat + '/' + lng + '/"  style="width:200px; height:200px"/></center><p>' +
                         '<p><center><img src="http://wheelroutes.icitylab.com/rest/obstacle/'+ lat + '/' + lng + '/"  style="width:200px; height:200px"/></center><p>' +
+//                        '<p><center><img src="http://localhost:8080/rest/obstacle/'+ lat + '/' + lng + '/"  style="width:200px; height:200px"/></center><p>' +
                         '</div></div>';
 
                 var infowindow = new google.maps.InfoWindow({
@@ -584,6 +622,9 @@
         <div class="container-fluid">
             <div class="navbar-header col-lg-3 col-md-2 col-sm-2" id="footer">
                 <center>&copy;<a class="orange-text text-lighten-3" href="https://wiki.smu.edu.sg/is480/IS480_Team_wiki%3A_2016T1_HumbleBees">Team HumbleBees</a></center>
+            </div>
+            <div class="col-lg-1 col-md-offset-7 col-md-2 col-sm-2">
+                <button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#legendModal"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Help</button>
             </div>
             <%--<i>Powered by <a class="orange-text text-lighten-3" href="https://wiki.smu.edu.sg/is480/IS480_Team_wiki%3A_2016T1_HumbleBees">Team HumbleBees</a></i>--%>
         </div>

@@ -77,10 +77,10 @@
         <h1>Admin Page</h1>
         <p class="lead">Process | View | Approve</p>
         <%--<a class="btn btn-lg btn-warning" href="/process-data.do" role="button">Process Data</a>--%>
-        <a class="btn btn-default" href="/process-data.do" role="button" style="background-color:#3D5B6E; color:white">Process Data</a>
-        <a class="btn btn-default" href="/data-analytics.do" role="button" style="background-color:#3D5B6E; color: white">Data Analytics</a>
-        <a class="btn btn-default" href="/routesView.do" role="button" style="background-color:#177E89; color:white">View by Routes</a>
-        <a class="btn btn-default" href="/coordinatesView.do" role="button" style="background-color:#177E89; color:white">View by Coordinates</a>
+        <a class="btn btn-warning" href="/process-data.do" role="button">Process Data</a>
+        <%--<a class="btn btn-default" href="/data-analytics.do" role="button" style="background-color:#3D5B6E; color: white">Data Analytics</a>--%>
+        <a class="btn btn-warning" href="/routesView.do" role="button">View by Routes</a>
+        <a class="btn btn-warning" href="/coordinatesView.do" role="button">View by Coordinates</a>
     </div>
 
     <div class="container-fluid">
@@ -103,8 +103,8 @@
                                 <td>${loop.count}</td>
                                 <td>${entry.email}</td>
                                 <td>${entry.timestamp}</td>
-                                <%--<td><img src="http://wheelroutes.icitylab.com/rest/obstacle/${entry.latitude}/${entry.longitude}/" style="width:200px; height:200px"></td>--%>
                                 <td><img src="http://wheelroutes.icitylab.com/rest/obstacle/${entry.latitude}/${entry.longitude}/" style="width:200px; height:200px"></td>
+                                <%--<td><img src="http://localhost:8080/rest/obstacle/${entry.latitude}/${entry.longitude}/" style="width:200px; height:200px"></td>--%>
                                 <td>${entry.description}</td>
                                 <td>
                                     <div class="container-fluid">

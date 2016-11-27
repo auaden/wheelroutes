@@ -80,40 +80,6 @@
     </div>
 </div>
 
-<%--<div class="section no-pad-bot" id="index-banner">--%>
-    <%--<div class="container">--%>
-        <%--<br><br>--%>
-        <%--<div class = "row center col s4">--%>
-            <%--<img id = "bee" src="../../images/bee.png" alt="Humblebee" class="responsive-img">--%>
-            <%--<h1 class="header center orange-text">Welcome Onboard!</h1>--%>
-            <%--<h5 class="header col s12 dark">Making wheelchair accessbility in Singapore a reality</h5>--%>
-        <%--</div>--%>
-        <%--<br>--%>
-        <%--<div class="container">--%>
-            <%--<form:form modelAttribute="user" action="process-registration.do" class="form-signin">--%>
-
-                <%--<!-- EMAIL SETTING-->--%>
-                <%--<div class="input-field col s6">--%>
-                    <%--<i class="material-icons prefix">email</i>--%>
-                    <%--<form:input path="email" id="inputEmail" type="email" class="validate" placeholder="Please include '@' in the email address"/>--%>
-                    <%--<form:label path="email" for="emailAddress" data-error="Try again!">Email</form:label>--%>
-                <%--</div>--%>
-                <%--<br>--%>
-
-                <%--<!-- PASSWORD SETTING -->--%>
-                <%--<div class="input-field col s12">--%>
-                    <%--<i class="material-icons prefix">vpn_key</i>--%>
-                    <%--<form:input path="password" id="password" type="password" class="validate" placeholder="Password is at least 6 numbers long"/>--%>
-                    <%--<form:label path="password" for="password">Password</form:label>--%>
-                <%--</div>--%>
-                <%--<br>--%>
-
-                <%--<button class="btn right" type="submit"><b>Register</b></button>--%>
-            <%--</form:form>--%>
-        <%--</div>--%>
-    <%--</div>--%>
-<%--</div>--%>
-
 <nav class="navbar navbar-default navbar-fixed-bottom">
     <% if (request.getAttribute("errorMsg") != null) { %>
     <div class="alert alert-danger alert-dismissible" role="alert">
@@ -124,7 +90,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-offset-1 col-sm-6">
-                <h3 class="text-danger" style="font-family:Ocie; color:white">Team Bio</h3>
+                <h3 class="text-danger" style="font-family: 'Dancing Script'; color:grey"><b>Team Bio</b></h3>
                 <p class="text-warning">We are a team of like-minded SMU students who have a heart to give back to society. The main goal of the project is to develop an application that enables and empowers wheelchair users in Singapore to be able to travel beyond their routine destinations.</p>
             </div>
             <div class="col-sm-offset-1 col-sm-2">

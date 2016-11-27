@@ -71,12 +71,11 @@ html,body{
 /*}*/
 
 .modal{
-    margin-top: 40px;
+    margin-top: 35px;
 }
 
-.modal-backdrop {
-    /*to display the modal in front of everything else*/
-    z-index: -1;
+.modal-backdrop.in {
+    opacity: 0.4;
 }
 
 .alert{
