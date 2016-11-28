@@ -110,10 +110,12 @@ public class CoordinateService {
         return displayMap;
     }
 
-    public void processData(int userId, String startDate, String endDate, HashMap<String, Integer> ratingMap) {
+    public void processData(int userId, String startDate, String endDate, HashMap<String, Integer> ratingMap, String tableName) {
         ArrayList<Coordinate> coordinates =
-                (ArrayList<Coordinate>)coordinateDao.findByDate(userId, startDate, endDate, coordTempTableName, true);
-        coordinateDao.insertBatch(coordinates, coordRawTableName);
+                (ArrayList<Coordinate>)coordinateDao.findByDate(userId, startDate, endDate, tableName, true);
+
+        ArrayList<Coordinate> insertingRawCoordinates = GpsUtility.removeDuplicatesAndNoFix(coordinates);
+        coordinateDao.insertRawBatch(insertingRawCoordinates, coordRawTableName);
         System.out.println("running algorithms for routes.. coord size: " + coordinates.size());
         HashMap<String, Route> result = runAlgorithmsForRoutes(coordinates, ratingMap);
         for (Map.Entry<String, Route> entry : result.entrySet()) {
@@ -134,12 +136,13 @@ public class CoordinateService {
 
     //ROUTES VIEW-----------------------------------------------------------------------------------------
     public HashMap<String, Route> startProcessingForRoutes (int userId,
-                                                                              String startDate,
-                                                                              String endDate,
-                                                                              HashMap<String, Integer> ratingMap) {
+                                                            String startDate,
+                                                            String endDate,
+                                                            HashMap<String, Integer> ratingMap,
+                                                            String tableName) {
 
         ArrayList<Coordinate> coordinates =
-                (ArrayList<Coordinate>)coordinateDao.findByDate(userId, startDate, endDate, coordRawTableName, true);
+                (ArrayList<Coordinate>)coordinateDao.findByDate(userId, startDate, endDate, tableName, true);
 
         System.out.println("running algorithms for routes.. coord size: " + coordinates.size());
         return runAlgorithmsForRoutes(coordinates, ratingMap);
@@ -339,8 +342,11 @@ public class CoordinateService {
             String key = userId + "," + timestamp;
             Integer rating = ratingMap.get(key);
             if (rating == null) {
-                coordinate.setRating(-1);
+                coordinate.setRating(0);
             } else {
+                if (rating != 0 && rating != 1 && rating != 2) {
+                    System.out.println("error!! rating is " + rating );
+                }
                 coordinate.setRating(rating);
             }
         }

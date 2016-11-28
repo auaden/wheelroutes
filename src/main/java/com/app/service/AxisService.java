@@ -33,15 +33,11 @@ public class AxisService {
     private static final double Y_CHANGE_STATIONARY = 0.132;
     private static final double Z_CHANGE_STATIONARY = 0.052;
 
-    private final double LVL4_SLOPE = 0.3; //100 - anything between NORMAL_SLOPE and STEEP_SLOPE is considered normal slope
-    private final double LVL3_SLOPE = 0.25; //100 - anything between NORMAL_SLOPE and STEEP_SLOPE is considered normal slope
-    private final double LVL2_SLOPE = 0.2; //50 - anything above SLIGHT_SLOPE and below NORMAL_SLOPE is considered slight slope
+    private final double LVL2_SLOPE = 0.3; //50 - anything above SLIGHT_SLOPE and below NORMAL_SLOPE is considered slight slope
     private final double LVL1_SLOPE = 0.15; //50 - anything above SLIGHT_SLOPE and below NORMAL_SLOPE is considered slight slope
 
-    private final double LVL4_BUMP = 1.06; //100
-    private final double LVL3_BUMP = 1.05; //500
-    private final double LVL2_BUMP = 1.04; //300
-    private final double LVL1_BUMP = 1.03; //100
+    private final double LVL2_BUMP = 1.20; //300
+    private final double LVL1_BUMP = 1.10; //100
 
     private final int numSecondsCompare = 2; //number of seconds to calculate bumpiness, only an estimate
     private int userSensitivity = 0;
@@ -54,10 +50,10 @@ public class AxisService {
         return toReturn;
     }
 
-    public HashMap<String, Integer> retrieveRatingMap(int userId, String startDate, String endDate) {
-//        ArrayList<Axis> rawAxes = (ArrayList<Axis>) axisDao.findAllByDate(userId, startDate, endDate, axisRawTableName);
-        ArrayList<Axis> rawAxes = (ArrayList<Axis>) axisDao.findAllByDate(userId, startDate, endDate, axisTempTableName);
-        axisDao.insertBatch(rawAxes, axisRawTableName);
+    public HashMap<String, Integer> retrieveRatingMap(int userId, String startDate, String endDate, String tableName) {
+        ArrayList<Axis> rawAxes = (ArrayList<Axis>) axisDao.findAllByDate(userId, startDate, endDate, tableName);
+        //ArrayList<Axis> rawAxes = (ArrayList<Axis>) axisDao.findAllByDate(userId, startDate, endDate, axisTempTableName);
+        //axisDao.insertBatch(rawAxes, axisRawTableName);
         ArrayList<AxisTimeFrame> axisTimeFrames = (ArrayList<AxisTimeFrame>) retrieveSortedAxisTimeFrame(rawAxes);
         //timestamp, rating
         HashMap<String, Integer> toReturn = loadRatingIntoMap(axisTimeFrames);
@@ -175,7 +171,7 @@ public class AxisService {
 
             //if it's a hard bump show red instantly
             if(changeOfVariance > UP_BUMP_VALUE){
-                return 6;
+                return 2;
             }
 
             slopeAverage += Math.abs(Math.sin(initialX));
@@ -197,12 +193,8 @@ public class AxisService {
             rating = 0;
         }else if(totalChangeOfVariance >= LVL1_BUMP && totalChangeOfVariance <LVL2_BUMP){
             rating = 1;
-        }else if(totalChangeOfVariance >= LVL2_BUMP && totalChangeOfVariance < LVL3_BUMP){
+        }else if(totalChangeOfVariance >= LVL2_BUMP){
             rating = 2;
-        }else if(totalChangeOfVariance >= LVL3_BUMP && totalChangeOfVariance < LVL4_BUMP){
-            rating = 3;
-        }else if(totalChangeOfVariance >= LVL4_BUMP){
-            rating = 4;
         }
 
         //slopeVariance = slopeVariance/data.size();
@@ -212,16 +204,12 @@ public class AxisService {
             rating += 0;
         }else if (slopeAverage >= LVL1_SLOPE && slopeAverage < LVL2_SLOPE){
             rating += 1;
-        }else if (slopeAverage >= LVL2_SLOPE && slopeAverage < LVL3_SLOPE){
+        }else if (slopeAverage >= LVL2_SLOPE ){
             rating += 2;
-        }else if (slopeAverage >= LVL3_SLOPE && slopeAverage < LVL4_SLOPE){
-            rating += 3;
-        }else if (slopeAverage >= LVL4_SLOPE){
-            rating += 4;
         }
 
-        if(rating >= 4){
-            rating = 4;
+        if(rating >= 2){
+            rating = 2;
         }
 
         //System.out.println("rating:  " + rating);

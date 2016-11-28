@@ -1,6 +1,7 @@
 package com.app.controller;
 
 import com.app.Utility.StopWatch;
+import com.app.dao.AxisDao;
 import com.app.domain.*;
 import com.app.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +50,9 @@ public class FrontController {
 
     @Autowired
     public String axisRawTableName;
+
+    @Autowired
+    public String axisTempTableName;
 
     @RequestMapping(value = "/landing", method = RequestMethod.GET)
     public ModelAndView toLanding() {
@@ -152,13 +156,13 @@ public class FrontController {
             for (Map.Entry<String, Integer> entry2 : entry.getValue().entrySet()) {
                 String date = entry2.getKey();
                 //System.out.println("USERID " + userId + " DATE " + date);
-                HashMap<String, Integer> ratingMap = axisService.retrieveRatingMap(userId, date + " 00:00", date + " 23:59");
-                coordinateService.processData(userId, date + " 00:00", date + " 23:59", ratingMap);
+                HashMap<String, Integer> ratingMap = axisService.retrieveRatingMap(userId, date + " 00:00", date + " 23:59", axisTempTableName);
+                coordinateService.processData(userId, date + " 00:00", date + " 23:59", ratingMap, coordTempTableName);
             }
         }
         watch.stop();
-        axisService.deleteData();
-        coordinateService.deleteData();
+        //axisService.deleteData();
+        //coordinateService.deleteData();
         System.out.println("Total processing time: " + TimeUnit.MILLISECONDS.toMinutes(watch.getTime()) + " mins");
         mv.setViewName("redirect:landing.do");
         return mv;
@@ -211,8 +215,8 @@ public class FrontController {
 
         //HashMap<String, Route> coordinates = coordinateService.retrieveViewCoordinates(userId, startDate, endDate);
 
-        HashMap<String, Integer> ratingMap = axisService.retrieveRatingMap(userId, startDate, endDate);
-        HashMap<String, Route> coordinates = coordinateService.startProcessingForRoutes(userId, startDate, endDate, ratingMap);
+        HashMap<String, Integer> ratingMap = axisService.retrieveRatingMap(userId, startDate, endDate, axisRawTableName);
+        HashMap<String, Route> coordinates = coordinateService.startProcessingForRoutes(userId, startDate, endDate, ratingMap,coordRawTableName);
 
         HashMap<String, Integer> dateMap = sortDateInputIntoMap(userId, startDate, endDate);
         ModelAndView mv = new ModelAndView("routesView");
@@ -311,10 +315,37 @@ public class FrontController {
         return new ModelAndView("redirect:landing.do");
     }
 
+    @Autowired
+    private AxisDao axisDao;
+
 
     @GetMapping(value = "/test")
     public ModelAndView toTest() {
-        ModelAndView mv = new ModelAndView("test");
-        return mv;
+        return new ModelAndView("test");
+
+    }
+    @GetMapping(value = "/remove-duplicates")
+    public void removeDupes() {
+        ArrayList<Axis> axes = (ArrayList<Axis>) axisDao.findAllByDate(9, "2016-10-06 00:00", "2016-10-06 12:00", axisRawTableName);
+        int counter = 0;
+        HashMap<String, Axis> map = new HashMap<>();
+        ArrayList<Axis> list = new ArrayList<>();
+        for (Axis axis : axes) {
+            String timestamp = axis.getTimestamp().toString();
+            int userId = axis.getUserId();
+            double x = axis.getxAxis();
+            double y = axis.getyAxis();
+            double z = axis.getzAxis();
+            String compositeKey = userId + timestamp + x + y + z;
+            Axis value = map.get(compositeKey);
+            if (value == null) {
+                map.put(compositeKey, axis);
+                list.add(axis);
+            } else {
+                counter++;
+            }
+        }
+        System.out.println("size of list wwwww: " + list.size());
+        System.out.println("eliminated: " + counter);
     }
 }

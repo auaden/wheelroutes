@@ -11,7 +11,7 @@
     <title>Title</title>
 </head>
 <body>
-<a href="http://localhost:8080/rest/coordinate/send/coordinates">SEND processed</a><br>
+<a href="/remove-duplicates.do">remove duplicates</a><br>
 
 
 </body>

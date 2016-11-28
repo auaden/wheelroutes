@@ -284,14 +284,9 @@
         });
 
         var Colors = [
-            "#000000",
             "#07cc04",
-            "#99ff33",
-            "#ccff33",
             "#ffff00",
-            "#ff9933",
-            "#ff751a",
-            "#db2902"
+            "#ff0000"
         ];
 
         <c:forEach var="entry1" items="${viewCoordinates}">
@@ -302,16 +297,10 @@
             </c:forEach>
         ];
 
-//        var heatmap = new google.maps.visualization.HeatmapLayer({
-//            data: routeCoordinates,
-//            dissipating: false
-//        });
-//        heatmap.setMap(map);
-
         var route = new google.maps.Polyline({
             path: routeCoordinates,
             strokeOpacity: 1,
-            strokeColor: Colors[${entry1.value.rating} + 1],
+            strokeColor: Colors[${entry1.value.rating}],
             strokeWeight: 12
         });
         route.setMap(map);
