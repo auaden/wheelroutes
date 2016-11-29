@@ -134,6 +134,33 @@
     </div>
 </div>
 
+
+<div class="modal fade" id="legendModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title"><center>Colour Legend</center></h4>
+            </div>
+            <div class="modal-body">
+                <p><center><img id = "colour_rating" src="../../images/colour_rating.PNG" alt="Colour Rating" class="responsive-img right-align"></center></p>
+                <center><p>The colours represent different rating level on a route, considering the presence of bumps and slopes. </p><p>It reflects the user's sensitivity based on his/her pain level and sitting balance.
+                <font color="#07CC04">Green </font> represents a smooth route and <font color="#DB2902">red </font> represents a bumpy route, with <font color="#FFFF00">yellow </font> in-between.</p></center>
+            </div>
+            <div class="modal-footer">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-lg-6 col-lg-offset-3">
+                            <!-- <button type="button" class="btn btn-default" data-dismiss="modal">Close</button> -->
+                            <button type="button" class="btn btn-block btn-primary" data-dismiss="modal">Okay, got it!</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+
 <div class="modal fade" id="legendModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -159,7 +186,6 @@
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
 </div>
-
 <!-- Fixed navbar -->
 <nav role="navigation" class="navbar navbar-default navbar-fixed-top">
     <div class="container-fluid">
@@ -235,6 +261,7 @@
         </div>
     </div>
 </nav>
+
 
 <div id="map" style="height: 95%;"></div>
 

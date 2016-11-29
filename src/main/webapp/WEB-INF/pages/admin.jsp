@@ -79,6 +79,7 @@
         <%--<a class="btn btn-lg btn-warning" href="/process-data.do" role="button">Process Data</a>--%>
         <a class="btn btn-warning" href="/process-data.do" role="button">Process Data</a>
         <%--<a class="btn btn-default" href="/data-analytics.do" role="button" style="background-color:#3D5B6E; color: white">Data Analytics</a>--%>
+        <a class="btn btn-warning" href="/gridView.do" role="button">View Merged Routes</a>
         <a class="btn btn-warning" href="/routesView.do" role="button">View by Routes</a>
         <a class="btn btn-warning" href="/coordinatesView.do" role="button">View by Coordinates</a>
     </div>
