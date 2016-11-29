@@ -68,9 +68,6 @@ public class CoordinateRestController {
                 filteredCoordinates.add(new Coordinate(userId, ts, lat, lng, numSat));
             }
         }
-        for (Coordinate c : filteredCoordinates) {
-            System.out.println(c.toString());
-        }
         coordinateDao.insertRawBatch(filteredCoordinates, coordTempTableName);
     }
 

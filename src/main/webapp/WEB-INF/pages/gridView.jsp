@@ -31,7 +31,7 @@
 <%--<body onload="checkCookie()">--%>
 <body>
 <%--Modal for login function--%>
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" data-backdrop="false">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -52,9 +52,14 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="Redirect()">Not Registered?</button>
-                    <!--<a href="/register.do"><button class="btn center">Not registered?</button></a>-->
-                    <input type="submit" class="btn btn-warning" value="Sign in" style="color:default"/>
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-lg-6 col-lg-offset-3">
+                                    <%--<button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="Redirect()">Not Registered?</button>--%>
+                                <input type="submit" class="btn btn-block" value="Login" style="background-color:#565656; color: white"/>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </form:form>
         </div>
@@ -91,32 +96,68 @@
                         <center>
                             <div class="well">Do you find the colour coded routes accurate to your needs? </div>
                             <div class="radio">
-                                <label class="radio-inline"><input type="radio" name="optradio">Yes</label>
-                                <label class="radio-inline"><input type="radio" name="optradio">No</label>
+                                <label class="radio-inline"><input type="radio" name="optradio" value="yes" id="yes">Yes</label>
+                                <label class="radio-inline"><input type="radio" name="optradio" value="no" id="no">No</label>
                             </div>
+                            <div id="accuracyMsg" style="display:none; color:red">Please indicate a value.</p>
                         </center>
                     </div>
                     <div class="step">
                         <center>
                             <div class="well">I find it ____ painful following the colour coded routes.</div>
                             <div class="radio">
-                                <label class="radio-inline"><input type="radio" name="optradio" value="more">More</label>
-                                <label class="radio-inline"><input type="radio" name="optradio" value="less">Less</label>
+                                <label class="radio-inline"><input type="radio" name="optradio" value="more" id="more">More</label>
+                                <label class="radio-inline"><input type="radio" name="optradio" value="less" id="less">Less</label>
                             </div>
+                            <div id="painMsg" style="display:none;color:red">Please indicate a value.</p>
                         </center>
                     </div>
                     <div class="step well">
+                        <%if(request.getAttribute("authUser") != null) {
+                            String loginStatus = (String)session.getAttribute("firstLogin");
+                            if(loginStatus!= null && loginStatus.equals("subsequent")){
+                                session.setAttribute("firstLogin", "rating");
+                            }
+//                                session.setAttribute("firstLogin", "first");
+                            System.out.println("RATING: " + session.getAttribute("firstLogin"));
+                        }%>
                         <center>Thank you for your input!</center>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button class="action back btn btn-info">Back</button>
                     <button class="action next btn btn-info">Next</button>
-                    <button class="action submit btn btn-success">Submit</button>
+                    <button class="action submit btn btn-success">Close</button>
                 </div>
             </form>
         </div>
     </div>
+</div>
+
+<div class="modal fade" id="legendModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title"><center>Colour Legend</center></h4>
+            </div>
+            <div class="modal-body">
+                <p><center><img id = "colour_rating" src="../../images/colour_rating.PNG" alt="Colour Rating" class="responsive-img right-align"></center></p>
+                <center><p>The colours represent different rating level on a route, considering the presence of bumps and slopes. </p><p>It reflects the user's sensitivity based on his/her pain level and sitting balance.
+                    <font color="#07CC04">Green </font> represents a smooth route and <font color="#DB2902">red </font> represents a bumpy route, with <font color="#FFFF00">yellow </font> in-between.</p></center>
+            </div>
+            <div class="modal-footer">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-lg-6 col-lg-offset-3">
+                            <!-- <button type="button" class="btn btn-default" data-dismiss="modal">Close</button> -->
+                            <button type="button" class="btn btn-block btn-primary" data-dismiss="modal">Okay, got it!</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
 </div>
 
 <!-- Fixed navbar -->
@@ -131,48 +172,63 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="#"><i class="fa fa-wheelchair fa-2x" aria-hidden="true"></i>WheelRoutes</a>
+                <%--<a class="navbar-brand" href="#"><i class="fa fa-wheelchair fa-2x" aria-hidden="true"></i>WheelRoutes</a>--%>
+                <a class="navbar-brand" href=""><i class="fa fa-wheelchair fa-2x" aria-hidden="true"></i></a><div id="wheelRoutes">WheelRoutes</div>
             </div>
             <!-- Collection of nav links and other content for toggling -->
             <div id="collapse navbar-collapse" class="collapse navbar-collapse">
                 <!--Replace login button to logout button for successfully logged in user-->
                 <!-- for search bar of locations -->
-                <ul class="nav navbar-nav col-lg-7 col-md-5 col-sm-8">
+                <ul class="nav navbar-nav col-lg-8 col-md-5 col-sm-8">
                     <%--to display logged in username--%>
                     <%
                         if (request.getAttribute("authUser") != null) {
                             User user = (User) request.getAttribute("authUser");
+                            String loginStatus = (String)session.getAttribute("firstLogin");
+                            if(loginStatus == null) {
+                                session.setAttribute("firstLogin", "first");
+                            } else if(loginStatus.equals("rating")){
+                                session.setAttribute("firstLogin", "afterRating");
+                            } else {
+                                session.setAttribute("firstLogin", "subsequent");
+                            }
                     %>
                     <p class="navbar-text"><i>Signed in as <b><%=user.getEmail()%></b></i></p>
                     <%}%>
                     <div class="navbar-form navbar-left" role="search">
                         <div class="form-group">
-                            <input type="text" class="form-control" id="addressSearch" placeholder="Search">
+                            <input type="text" class="form-control" id="addressSearch" placeholder="Search location...">
                         </div>
                         <button type="submit" id="submitSearch" class="btn btn-default">Submit</button>
                     </div>
-
-                    <button type="button" class="btn btn-default" id="gps" onclick="initMap.getLocation()">
-                        <span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span>
-                    </button>
+                    <%--<button type="button" class="btn btn-default" id="gps" onclick="initMap.getLocation()">--%>
+                    <%--<span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span>--%>
+                    <%--</button>--%>
                 </ul>
 
-                <ul class="nav navbar-nav navbar-right col-lg-3 col-md-5 col-sm-2">
+                <ul class="nav navbar-nav navbar-right col-lg-2 col-md-5 col-sm-2">
                     <div class="btn-group" role="group" aria-label="...">
                         <%
                             if (request.getAttribute("authUser") == null) {
+                                session.removeAttribute("firstLogin");
                         %>
-                        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#exampleModal" id="login">Login
+                        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#exampleModal" id="login"
+                                style="background-color:#565656; color: white">Login
                         </button>
+                        <button type="button" class="btn btn-warning" onclick="Redirect()">Register</button>
                         <%--for logged in user: logout function--%>
                         <%
                         }else{
-                        %>
-                        <a href="/process-logout.do"><button class="btn btn-default" type="button" id="logout">Logout</button></a>
+                            User user = (User) request.getAttribute("authUser");
+                            boolean isAdmin = user.getEmail().contains("humblebees");
+                            if(isAdmin){%>
+                        <a href="/admin.do"><button class="btn btn-default" type="button" id="admin"><span class="glyphicon glyphicon-circle-arrow-right" aria-hidden="true"></span> Admin</button></a>
                         <%}%>
-                        <button class="btn btn-warning" type="button" id="drop" onclick="initMap.drop()" style="color:default">
-                            Obstacle Reported
-                        </button>
+                        <a href="/process-logout.do"><button class="btn btn-warning" type="button" id="logout">Logout</button></a>
+                        <%}%>
+                        <%--<button class="btn btn-warning" type="button" id="drop" onclick="initMap.drop()" style="color:default">--%>
+                        <%--Obstacle Reported--%>
+                        <%--</button>--%>
                     </div>
                 </ul>
             </div> <!--End of row -->
@@ -231,11 +287,55 @@
         setProgress(current);
 
         // Next button click action
-        btnnext.click(function (e) {
-            if (current < widget.length) {
-                widget.show();
-                widget.not(':eq(' + (current++) + ')').hide();
-                setProgress(current);
+        btnnext.click(function(e){
+            if(current < widget.length){
+                // var x = document.getElementById("yes").value;
+                if (current == 2){
+                    // var selection = document.querySelectorAll('input[name="accuracy"]');
+                    // var response = selection[0].value;
+                    var accuracyYes = document.getElementById('yes').checked;
+                    var accuracyNo = document.getElementById('no').checked;
+                    console.log("Yes Test: " + accuracyYes);
+                    console.log("No Test: " + accuracyNo);
+                    //user never press any button
+                    if(!accuracyYes && !accuracyNo){
+                        document.getElementById('accuracyMsg').style.display = "block";
+                    }
+
+                    //user feel that color rating is NOT accurate
+                    if (!accuracyYes && accuracyNo){
+                        widget.show();
+                        widget.not(':eq('+(current++)+')').hide();
+                        setProgress(current);
+                        //user feel that color rating is accurate
+                    } else if(accuracyYes && !accuracyNo){
+                        widget.next().show();
+                        widget.not(':eq('+(widget.length - 1)+')').hide();
+                        current = parseInt(widget.length);
+                        setProgress(current);
+                    }
+                } else if (current == 3){
+                    var painYes = document.getElementById('more').checked;
+                    var painNo = document.getElementById('less').checked;
+                    console.log("Pain Test: " + painYes);
+                    console.log("Not Pain Test: " + painNo);
+
+                    if(!painYes && !painNo){
+                        document.getElementById('painMsg').style.display = "block";
+                    }
+
+                    if(!painYes && painNo || painYes && !painNo){
+                        widget.next().show();
+                        widget.not(':eq('+(widget.length - 1)+')').hide();
+                        current = parseInt(widget.length);
+                        setProgress(current);
+                    }
+
+                } else{
+                    widget.show();
+                    widget.not(':eq('+(current++)+')').hide();
+                    setProgress(current);
+                }
             }
             hideButtons(current);
             e.preventDefault();
@@ -245,16 +345,31 @@
         btnback.click(function (e) {
             if (current > 1) {
                 current = current - 2;
-                btnnext.trigger('click');
             }
+            btnnext.trigger('click');
             hideButtons(current);
             e.preventDefault();
         })
 
-        <%if (request.getAttribute("authUser") != null) {%>
+        <%if(request.getAttribute("authUser") != null) {
+            String loginStatus = (String)session.getAttribute("firstLogin");
+            User user = (User) request.getAttribute("authUser");
+            //modal will only be displayed for normal users, except for admin and subsequent login users
+            if (!user.getEmail().contains("humblebees") && loginStatus != null && loginStatus.equals("subsequent")) { %>
         $('#ratingModal').modal('toggle');
-        <%}%>
+        <%}}%>
     });
+
+    <%--//checks if user reloads the page after login--%>
+    <%--if(window.performance){--%>
+    <%--if(performance.navigation.type  == 1){--%>
+    <%--console.log('page reloaded');--%>
+    <%--<%if (request.getAttribute("firstLogin") != null){--%>
+    <%--request.setAttribute("firstLogin",null);--%>
+    <%--}--%>
+    <%--%>--%>
+    <%--}--%>
+    <%--}--%>
 
     // Change progress bar action
     setProgress = function(currstep){
@@ -271,7 +386,7 @@
 
         if(current < limit) btnnext.show();
         if(current > 1) btnback.show();
-        if (current == limit) { btnnext.hide(); btnsubmit.show(); }
+        if (current == limit) { btnnext.hide(); btnsubmit.show(); btnback.hide()}
     }
 
     //to redirect logged in user to register page
@@ -285,47 +400,22 @@
 
     function initMap() {
 
-        //TO GET CURRENT LOCATION OF THE USER
-//            if(initialLanding){
-//                getLocation();
-//            }
-//
-//            function getLocation() {
+        //for navbar current location subsequent recall
+//            initMap.getLocation = function getLocation() {
+//                initialLanding = false;
 //                if (navigator.geolocation) {
 //                    navigator.geolocation.getCurrentPosition(showPosition, showError);
 //                } else {
 //                    alert("Geolocation is not supported by this browser.");
 //                }
 //            }
-
-        //for navbar current location subsequent recall
-        initMap.getLocation = function getLocation() {
-            initialLanding = false;
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(showPosition, showError);
-            } else {
-                alert("Geolocation is not supported by this browser.");
-            }
-        }
-
-        function showPosition(position) {
-            defaultLat = position.coords.latitude;
-            defaultLng = position.coords.longitude;
-            defaultZoomLevel = 16;
-            initMap();
-            //for subsequrnt current location recall
-//                if (!initialLanding){
-//                    map = new google.maps.Map(document.getElementById('map'), {
-//                        center: {lat: defaultLat, lng: defaultLng},
-//                        scrollwheel: true,
-//                        zoom: 18,
-//                    });
-//                } else{
-//                    //for inital landing page
-//                    initialLanding = false;
-//                    initMap();
-//                }
-        }
+//
+//            function showPosition(position) {
+//                defaultLat = position.coords.latitude;
+//                defaultLng = position.coords.longitude;
+//                defaultZoomLevel = 16;
+//                initMap();
+//            }
 
 
         map = new google.maps.Map(document.getElementById('map'), {
@@ -345,15 +435,11 @@
         });
 
         var Colors = [
-            "#000000",
             "#07cc04",
-            "#99ff33",
-            "#ccff33",
             "#ffff00",
-            "#ff9933",
-            "#ff751a",
-            "#db2902"
+            "#ff0000"
         ];
+
         <c:forEach var="entry1" items="${viewRoutes}">
         <c:forEach var="route" items="${entry1.value}">
         var routeCoordinates = [
@@ -365,9 +451,9 @@
 
         var route = new google.maps.Polyline({
             path: routeCoordinates,
-            strokeOpacity: 0.6,
-            strokeColor: Colors[${route.rating} + 1],
-            strokeWeight: 12
+            strokeOpacity: 1,
+            strokeColor: Colors[${route.rating}],
+            strokeWeight: 8
         });
         route.setMap(map);
         </c:forEach>
@@ -472,8 +558,8 @@
                     '<p><b>Description:</b></p>' +
                     '<p>' + desc + '</p>' +
                     '<b>Timestamp: </b>' + ts +
-//                        '<p><center><img src="http://wheelroutes.icitylab.com/rest/obstacle/'+ lat + '/' + lng + '/"  style="width:200px; height:200px"/></center><p>' +
                     '<p><center><img src="http://wheelroutes.icitylab.com/rest/obstacle/'+ lat + '/' + lng + '/"  style="width:200px; height:200px"/></center><p>' +
+//                        '<p><center><img src="http://localhost:8080/rest/obstacle/'+ lat + '/' + lng + '/"  style="width:200px; height:200px"/></center><p>' +
                     '</div></div>';
 
             var infowindow = new google.maps.InfoWindow({
@@ -493,54 +579,11 @@
             }
             return color;
         }
-
-        initMap.drop = function drop() {
-            clearMarkers();
-            for (var i = 0; i < obstacles.length; i++) {
-                addMarkerWithTimeout(obstacles[i], i * 200);
-            }
-        }
-
-        function addMarkerWithTimeout(position, timeout) {
-            window.setTimeout(function() {
-                markers.push(new google.maps.Marker({
-                    position: position,
-                    map: map,
-                    animation: google.maps.Animation.DROP,
-                    icon: image
-                }));
-            }, timeout);
-        }
-
-        function clearMarkers() {
-            for (var i = 0; i < markers.length; i++) {
-                markers[i].setMap(null);
-            }
-            markers = [];
-        }
-
-        // ERORR FOR RETRIEVING USER'S GEOLOCATION
-        function showError(error) {
-            switch(error.code) {
-                case error.PERMISSION_DENIED:
-                    alert("User denied the request for Geolocation.");
-                    break;
-                case error.POSITION_UNAVAILABLE:
-                    alert("Location information is unavailable.");
-                    break;
-                case error.TIMEOUT:
-                    alert("The request to get user location timed out.");
-                    break;
-                case error.UNKNOWN_ERROR:
-                    alert("An unknown error occurred.");
-                    break;
-            }
-        }
     }
 
     //for search function at the nav bar to allow user to search for text locations within the Google Map
     function geocodeAddress(geocoder, resultsMap) {
-        var address = document.getElementById('addressSearch').value;
+        var address = document.getElementById('addressSearch').value + "Singapore";
         geocoder.geocode({'address': address}, function(results, status) {
             if (status === 'OK') {
                 defaultLat = results[0].geometry.location.lat();
@@ -548,15 +591,40 @@
                 defaultZoomLevel = 16;
                 initMap();
             } else {
-                alert('Geocode was not successful for the following reason: ' + status);
+//                    alert('Geocode was not successful for the following reason: ' + status);
+                showError(status);
             }
         });
     }
+
+    // ERORR FOR RETRIEVING USER'S GEOLOCATION
+    function showError(error) {
+        switch(error.code) {
+            case error.PERMISSION_DENIED:
+                alert("User denied the request for Geolocation.");
+                break;
+            case error.POSITION_UNAVAILABLE:
+                alert("Location information is unavailable.");
+                break;
+            case error.TIMEOUT:
+                alert("The request to get user location timed out.");
+                break;
+            case error.UNKNOWN_ERROR:
+                alert("An unknown error occurred.");
+                break;
+        }
+    }
 </script>
 
-<nav class="navbar navbar-default navbar-fixed-bottom">
-    <div class="container">
-        <i>Powered by <a class="orange-text text-lighten-3" href="https://wiki.smu.edu.sg/is480/IS480_Team_wiki%3A_2016T1_HumbleBees">Team HumbleBees</a></i>
+<nav class="navbar navbar-default navbar-fixed-bottom" style="min-height:25px;height:5%">
+    <div class="container-fluid">
+        <div class="navbar-header col-lg-3 col-md-2 col-sm-2" id="footer">
+            <center>&copy;<a class="orange-text text-lighten-3" href="https://wiki.smu.edu.sg/is480/IS480_Team_wiki%3A_2016T1_HumbleBees">Team HumbleBees</a></center>
+        </div>
+        <div class="col-lg-1 col-md-offset-7 col-md-2 col-sm-2">
+            <button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#legendModal"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Help</button>
+        </div>
+        <%--<i>Powered by <a class="orange-text text-lighten-3" href="https://wiki.smu.edu.sg/is480/IS480_Team_wiki%3A_2016T1_HumbleBees">Team HumbleBees</a></i>--%>
     </div>
 </nav>
 

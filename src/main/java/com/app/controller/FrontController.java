@@ -155,14 +155,17 @@ public class FrontController {
             int userId = entry.getKey();
             for (Map.Entry<String, Integer> entry2 : entry.getValue().entrySet()) {
                 String date = entry2.getKey();
-                //System.out.println("USERID " + userId + " DATE " + date);
+                System.out.println("USERID " + userId + " DATE " + date);
+
+                //HashMap<String, Integer> ratingMap = axisService.retrieveRatingMap(userId, date + " 00:00", date + " 23:59", axisRawTableName);
+                //coordinateService.processData(userId, date + " 00:00", date + " 23:59", ratingMap, coordRawTableName);
                 HashMap<String, Integer> ratingMap = axisService.retrieveRatingMap(userId, date + " 00:00", date + " 23:59", axisTempTableName);
                 coordinateService.processData(userId, date + " 00:00", date + " 23:59", ratingMap, coordTempTableName);
             }
         }
         watch.stop();
-        //axisService.deleteData();
-        //coordinateService.deleteData();
+        axisService.deleteData(axisTempTableName);
+        coordinateService.deleteData(axisTempTableName);
         System.out.println("Total processing time: " + TimeUnit.MILLISECONDS.toMinutes(watch.getTime()) + " mins");
         mv.setViewName("redirect:landing.do");
         return mv;
@@ -213,10 +216,10 @@ public class FrontController {
                                             @RequestParam("startDate") String startDate,
                                             @RequestParam("endDate") String endDate) {
 
-        //HashMap<String, Route> coordinates = coordinateService.retrieveViewCoordinates(userId, startDate, endDate);
+        HashMap<String, Route> coordinates = coordinateService.retrieveViewCoordinates(userId, startDate, endDate);
 
-        HashMap<String, Integer> ratingMap = axisService.retrieveRatingMap(userId, startDate, endDate, axisRawTableName);
-        HashMap<String, Route> coordinates = coordinateService.startProcessingForRoutes(userId, startDate, endDate, ratingMap,coordRawTableName);
+        //HashMap<String, Integer> ratingMap = axisService.retrieveRatingMap(userId, startDate, endDate, axisRawTableName);
+        //HashMap<String, Route> coordinates = coordinateService.startProcessingForRoutes(userId, startDate, endDate, ratingMap,coordRawTableName);
 
         HashMap<String, Integer> dateMap = sortDateInputIntoMap(userId, startDate, endDate);
         ModelAndView mv = new ModelAndView("routesView");
@@ -252,9 +255,6 @@ public class FrontController {
         TreeMap<Integer, TreeMap<String, Integer>> coordData = coordinateService.retrieveOverallCoordData(coordRawTableName);
         TreeMap<Integer, TreeMap<String, Integer>> axisData = coordinateService.retrieveOverallCoordData(axisRawTableName);
         //coordinateService.getTimeSpent(data);
-
-
-
         mv.addObject("coordDataByIdAndTimestamp", coordData);
         mv.addObject("axisDataByIdAndTimestamp", axisData);
         return mv;
@@ -303,7 +303,10 @@ public class FrontController {
     @RequestMapping(value = "/process-feedback", method = RequestMethod.POST)
     public ModelAndView processFeedback(@ModelAttribute("authUser") User user,
                                         @RequestParam("optradio") String feedback) {
-        System.out.println("feedback value = " + feedback);
+
+        ModelAndView mv = new ModelAndView("landing", "user", new User());
+
+        ArrayList<Obstacle> obstacles = obstacleService.retrieveAllApproved();
         if (feedback.equals("yes")){
             return new ModelAndView("redirect:landing.do");
         }
@@ -312,7 +315,28 @@ public class FrontController {
             feedbackInt = 1;
         }
         userService.modifySensitivity(user, feedbackInt);
-        return new ModelAndView("redirect:landing.do");
+
+        HashMap<Integer, ArrayList<Route>> routes = coordinateService.retrieveViewCoordinates(false);
+        for (Map.Entry<Integer, ArrayList<Route>> entry : routes.entrySet()) {
+            ArrayList<Route> routeList = entry.getValue();
+            for (Route route : routeList) {
+                if (feedback.equals("more")) {
+                    int rating = route.getRating();
+                    if (rating < 2) {
+                        route.setRating(route.getRating() + 1);
+                    }
+                } else {
+                    int rating = route.getRating();
+                    if (rating > 0) {
+                        route.setRating(route.getRating() - 1);
+                    }
+                }
+            }
+        }
+
+        mv.addObject("viewRoutes", routes);
+        mv.addObject("obstacles", obstacles);
+        return mv;
     }
 
     @Autowired

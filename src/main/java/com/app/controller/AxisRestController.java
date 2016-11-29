@@ -65,80 +65,78 @@ public class AxisRestController {
         TreeMap<Integer, TreeMap<String, Integer>> data = coordinateService.retrieveOverallCoordData(axisRawTableName);
         for (Map.Entry<Integer, TreeMap<String, Integer>> entry : data.entrySet()) {
             int userId = entry.getKey();
-            if (userId == 11) {
-                for (Map.Entry<String, Integer> entry2 : entry.getValue().entrySet()) {
-                    String date = entry2.getKey();
-                    String startDate = date + "00:00";
-                    String endDate = date + "23:59";
+            for (Map.Entry<String, Integer> entry2 : entry.getValue().entrySet()) {
+                String date = entry2.getKey();
+                String startDate = date + "00:00";
+                String endDate = date + "23:59";
 
-                    ArrayList<Axis> axes = (ArrayList<Axis>) axisDao.findAllByDate(userId, startDate, endDate, axisRawTableName);
+                ArrayList<Axis> axes = (ArrayList<Axis>) axisDao.findAllByDate(userId, startDate, endDate, axisRawTableName);
 
-                    JsonArray jArray = new JsonArray();
-                    int batchCounter = 0;
-                    for (Axis axis : axes) {
-                        if (axis != null) {
-                            JsonObject object = new JsonObject();
-                            JsonPrimitive userIdElement = new JsonPrimitive(axis.getUserId());
-                            JsonPrimitive timestampElement = new JsonPrimitive(axis.getTimestamp().toString());
-                            JsonPrimitive xElement = new JsonPrimitive(axis.getxAxis());
-                            JsonPrimitive yElement = new JsonPrimitive(axis.getyAxis());
-                            JsonPrimitive zElement = new JsonPrimitive(axis.getzAxis());
-                            object.add("userId", userIdElement);
-                            object.add("timestamp", timestampElement);
-                            object.add("xAxis", xElement);
-                            object.add("yAxis", yElement);
-                            object.add("zAxis", zElement);
-                            jArray.add(object);
+                JsonArray jArray = new JsonArray();
+                int batchCounter = 0;
+                for (Axis axis : axes) {
+                    if (axis != null) {
+                        JsonObject object = new JsonObject();
+                        JsonPrimitive userIdElement = new JsonPrimitive(axis.getUserId());
+                        JsonPrimitive timestampElement = new JsonPrimitive(axis.getTimestamp().toString());
+                        JsonPrimitive xElement = new JsonPrimitive(axis.getxAxis());
+                        JsonPrimitive yElement = new JsonPrimitive(axis.getyAxis());
+                        JsonPrimitive zElement = new JsonPrimitive(axis.getzAxis());
+                        object.add("userId", userIdElement);
+                        object.add("timestamp", timestampElement);
+                        object.add("xAxis", xElement);
+                        object.add("yAxis", yElement);
+                        object.add("zAxis", zElement);
+                        jArray.add(object);
+                    }
+
+                    if (batchCounter == 1000) {
+                        //System.out.println(jArray.toString());
+                        String postUrl = "http://wheelroutes.icitylab.com/rest/axis/axes";// put in your url
+                        Gson gson = new Gson();
+                        HttpClient httpClient = HttpClientBuilder.create().build();
+                        HttpPost post = new HttpPost(postUrl);
+
+                        StringEntity postingString = null;//gson.tojson() converts your pojo to json
+                        try {
+                            postingString = new StringEntity(gson.toJson(jArray));
+                        } catch (UnsupportedEncodingException e) {
+                            e.printStackTrace();
+                        }
+                        post.setEntity(postingString);
+                        post.setHeader("Content-type", "application/json");
+                        try {
+                            HttpResponse response = httpClient.execute(post);
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
 
-                        if (batchCounter == 1000) {
-                            //System.out.println(jArray.toString());
-                            String postUrl = "http://wheelroutes.icitylab.com/rest/axis/axes";// put in your url
-                            Gson gson = new Gson();
-                            HttpClient httpClient = HttpClientBuilder.create().build();
-                            HttpPost post = new HttpPost(postUrl);
-
-                            StringEntity postingString = null;//gson.tojson() converts your pojo to json
-                            try {
-                                postingString = new StringEntity(gson.toJson(jArray));
-                            } catch (UnsupportedEncodingException e) {
-                                e.printStackTrace();
-                            }
-                            post.setEntity(postingString);
-                            post.setHeader("Content-type", "application/json");
-                            try {
-                                HttpResponse response = httpClient.execute(post);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-
-                            jArray = new JsonArray();
-                            batchCounter = 0;
-                        }
-
-                        batchCounter++;
+                        jArray = new JsonArray();
+                        batchCounter = 0;
                     }
 
-                    String postUrl = "http://wheelroutes.icitylab.com/rest/axis/axes";// put in your url
-                    Gson gson = new Gson();
-                    HttpClient httpClient = HttpClientBuilder.create().build();
-                    HttpPost post = new HttpPost(postUrl);
-
-                    StringEntity postingString = null;//gson.tojson() converts your pojo to json
-                    try {
-                        postingString = new StringEntity(gson.toJson(jArray));
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
-                    post.setEntity(postingString);
-                    post.setHeader("Content-type", "application/json");
-                    try {
-                        HttpResponse response = httpClient.execute(post);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
+                    batchCounter++;
                 }
+
+                String postUrl = "http://wheelroutes.icitylab.com/rest/axis/axes";// put in your url
+                Gson gson = new Gson();
+                HttpClient httpClient = HttpClientBuilder.create().build();
+                HttpPost post = new HttpPost(postUrl);
+
+                StringEntity postingString = null;//gson.tojson() converts your pojo to json
+                try {
+                    postingString = new StringEntity(gson.toJson(jArray));
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+                post.setEntity(postingString);
+                post.setHeader("Content-type", "application/json");
+                try {
+                    HttpResponse response = httpClient.execute(post);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
             }
         }
 
@@ -164,14 +162,14 @@ public class AxisRestController {
     }
 
     @RequestMapping(value = "/{userId}/{startDate}/{endDate}/{tableName}", method=RequestMethod.GET)
-    public ModelAndView getListFromTableAndId(@PathVariable(value="userId") int userId,
+    public List<Axis> getListFromTableAndId(@PathVariable(value="userId") int userId,
                                               @PathVariable(value="startDate") String startDate,
                                               @PathVariable(value="endDate") String endDate,
                                               @PathVariable(value="tableName") String tableName)  {
-        ModelAndView mv = new ModelAndView("database");
-        ArrayList<Axis> data = (ArrayList<Axis>)axisDao.findAllByDate(userId, startDate, endDate, tableName);
-        mv.addObject("axisData", data);
-        return mv;
+
+        //ArrayList<Axis> data = (ArrayList<Axis>)axisDao.findAllByDate(userId, startDate, endDate, tableName);
+
+        return axisDao.findAllByDate(userId, startDate, endDate, tableName);
     }
 
 }

@@ -52,8 +52,7 @@ public class AxisService {
 
     public HashMap<String, Integer> retrieveRatingMap(int userId, String startDate, String endDate, String tableName) {
         ArrayList<Axis> rawAxes = (ArrayList<Axis>) axisDao.findAllByDate(userId, startDate, endDate, tableName);
-        //ArrayList<Axis> rawAxes = (ArrayList<Axis>) axisDao.findAllByDate(userId, startDate, endDate, axisTempTableName);
-        //axisDao.insertBatch(rawAxes, axisRawTableName);
+        axisDao.insertBatch(rawAxes, axisRawTableName);
         ArrayList<AxisTimeFrame> axisTimeFrames = (ArrayList<AxisTimeFrame>) retrieveSortedAxisTimeFrame(rawAxes);
         //timestamp, rating
         HashMap<String, Integer> toReturn = loadRatingIntoMap(axisTimeFrames);
@@ -275,8 +274,8 @@ public class AxisService {
         return toReturn;
     }
 
-    public void deleteData() {
-        axisDao.deleteAll(axisTempTableName);
+    public void deleteData(String tableName) {
+        axisDao.deleteAll(tableName);
     }
 
 

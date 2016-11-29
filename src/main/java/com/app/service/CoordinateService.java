@@ -116,6 +116,7 @@ public class CoordinateService {
 
         ArrayList<Coordinate> insertingRawCoordinates = GpsUtility.removeDuplicatesAndNoFix(coordinates);
         coordinateDao.insertRawBatch(insertingRawCoordinates, coordRawTableName);
+
         System.out.println("running algorithms for routes.. coord size: " + coordinates.size());
         HashMap<String, Route> result = runAlgorithmsForRoutes(coordinates, ratingMap);
         for (Map.Entry<String, Route> entry : result.entrySet()) {
@@ -494,8 +495,8 @@ public class CoordinateService {
 
     }
 
-    public void deleteData() {
-        coordinateDao.deleteAll(coordTempTableName);
+    public void deleteData(String tableName) {
+        coordinateDao.deleteAll(tableName);
     }
 
     public ArrayList<Coordinate> retrieveProcessedData(int userId, String startDate, String endDate) {
