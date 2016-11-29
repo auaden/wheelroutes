@@ -144,7 +144,7 @@
                 <div class="modal-body">
                     <p><center><img id = "colour_rating" src="../../images/colour_rating.PNG" alt="Colour Rating" class="responsive-img right-align"></center></p>
                     <center><p>The colours represent different rating level on a route, considering the presence of bumps and slopes. </p><p>It reflects the user's sensitivity based on his/her pain level and sitting balance.
-                        <font color="#07CC04">Green </font> represents a smooth route and <font color="#DB2902">red </font> represents a bumpy route, with <font color="#FFFF00">yellow </font> in-between.</p></center>
+                        <font color="#07CC04">Green </font> represents a smooth route and <font color="#DB2902">red </font> represents a bumpy route, with <font color="#D1E901">yellow </font> in-between.</p></center>
                 </div>
                 <div class="modal-footer">
                     <div class="container-fluid">
@@ -239,7 +239,7 @@
     <div id="map" style="height: 95%;"></div>
 
     <% if (request.getAttribute("authUser") != null) { %>
-        <div class="alert alert-success alert-dismissible" role="alert">
+        <div class="alert alert-success alert-dismissible" role="alert" id="successMessage">
             <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true"><b>&times;</b></span></button>
             <center><strong>Welcome!</strong> You can now click on the map to add obstacle that you have observed.</center>
         </div>
@@ -247,7 +247,7 @@
 
     <div class="alert alert-info alert-dismissible" role="alert" style="display:none" id="processedObstacle">
         <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true"><b>&times;</b></span></button>
-        <center>You have successfully added an obstacle. Our admin will process your request and display on the map soon.</center>
+        <center>When you add an obstacle, our admin will process your request and display on the map soon.</center>
     </div>
 
     <% if (request.getAttribute("errorMsg") != null) { %>
@@ -270,6 +270,7 @@
         var defaultLat = 1.362361;
         var defaultLng = 103.814071;
         var defaultZoomLevel = 12;
+//        var addObstacle = false;
         //var initialLanding = true;
 
         //FOR SENSITVITY RATING
@@ -354,8 +355,10 @@
             <%if(request.getAttribute("authUser") != null) {
                 String loginStatus = (String)session.getAttribute("firstLogin");
                 User user = (User) request.getAttribute("authUser");
+//                String obstacleStatus = (String) request.getAttribute("obstacle");
+//                System.out.println("Obstacle Status" + obstacleStatus);
                 //modal will only be displayed for normal users, except for admin and subsequent login users
-                if (!user.getEmail().contains("humblebees") && loginStatus != null && loginStatus.equals("subsequent")) { %>
+                if(!user.getEmail().contains("humblebees") && loginStatus != null && loginStatus.equals("first")){%>
                     $('#ratingModal').modal('toggle');
             <%}}%>
         });
@@ -510,7 +513,14 @@
                         '</div></div>';
 
                 var infowindow = new google.maps.InfoWindow({
-                    content: reportObstacleDescription
+                    content: '<div id="myInfoWinDiv">' + reportObstacleDescription +'</div>'
+                });
+
+                google.maps.event.addListener(infowindow,'domready',function(){
+                    $('#myInfoWinDiv').click(function(){
+                        document.getElementById("processedObstacle").style.display = "block";
+                        document.getElementById("successMessage").style.display = "none";
+                    });
                 });
 
                 if(previous){

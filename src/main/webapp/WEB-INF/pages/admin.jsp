@@ -164,11 +164,11 @@
 
     <%--</table>--%>
 
-    <div class="navbar navbar-default navbar-fixed-bottom">
+    <div class="navbar navbar-default navbar-fixed-bottom" style="position:fixed;min-height:25px;height:5%">
         <div class="container-fluid">
             <div class="row">
-                <div class="navbar-header col-lg-4 col-md-2 col-sm-2">
-                    <center><i>Powered by <a class="orange-text text-lighten-3" href="https://wiki.smu.edu.sg/is480/IS480_Team_wiki%3A_2016T1_HumbleBees">Team HumbleBees</a></i></center>
+                <div class="navbar-header col-lg-3 col-md-2 col-sm-2" id="footer">
+                    <center>&copy;<a class="orange-text text-lighten-3" href="https://wiki.smu.edu.sg/is480/IS480_Team_wiki%3A_2016T1_HumbleBees">Team HumbleBees</a></center>
                 </div>
             </div>
         </div>

@@ -167,7 +167,7 @@
     var defaultLng = 103.814071;
     var defaultZoomLevel = 12;
 
-    var image = 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png';
+//    var image = 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png';
 
     function TwoDigits(val){
         if (val < 10){
@@ -297,22 +297,27 @@
         $('#playButton').prop('disabled', true);
         clearMarkers();
 
+//        var Colors = [
+//            "#000000",
+//            "#07cc04",
+//            "#99ff33",
+//            "#ccff33",
+//            "#ffff00",
+//            "#ff9933",
+//            "#ff751a",
+//            "#db2902"
+//        ];
         var Colors = [
-            "#000000",
             "#07cc04",
-            "#99ff33",
-            "#ccff33",
             "#ffff00",
-            "#ff9933",
-            "#ff751a",
-            "#db2902"
+            "#ff0000"
         ];
 
         var i = 0;
         var array = "${viewCoordinates}";
         <c:forEach var="entry" items="${viewCoordinates}" varStatus="status">
         var position = {lat:${entry.latitude}, lng:${entry.longitude}};
-        var ratingColor = Colors[${entry.rating} + 1];
+        var ratingColor = Colors[${entry.rating}];
 
         var dateString = "${entry.timestamp}".substring(0,10);
         <%--console.log("Time: " + "${entry.timestamp}");--%>
@@ -324,7 +329,8 @@
                 position: position,
                 map: map,
                 animation: google.maps.Animation.DROP,
-                icon: image
+                //icon: image
+                label: "S"
             });
 
             var firstInfowindow = new google.maps.InfoWindow({
@@ -342,7 +348,8 @@
                 position: position,
                 map: map,
                 animation: google.maps.Animation.DROP,
-                icon: image
+                //icon: image
+                label: "E"
             });
 
             var lastInfowindow = new google.maps.InfoWindow({
